@@ -1,0 +1,2 @@
+add_subdirectory(test_opencv)
+add_subdirectory(test_wx_opencv)
