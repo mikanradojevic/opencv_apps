@@ -12,7 +12,7 @@ public:
 	c_overview_img_panel(wxWindow *parent,  
 						wxWindowID id = wxID_ANY,
 						const wxPoint& pos = wxDefaultPosition, 
-						const wxSize& size = wxSize(100, 100), 
+						const wxSize& size = wxDefaultSize, 
 						long style = wxTAB_TRAVERSAL);
 	
 private:
@@ -49,16 +49,14 @@ public:
 					const wxSize& size = wxSize( 500,300 ), 
 					long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL); 
 
-	~c_overview_frame() {} 
+	virtual ~c_overview_frame(); 
 	
 protected:
 
-	virtual void on_close( wxCloseEvent& event );
-	virtual void on_size( wxSizeEvent& event ); 
-
 private: 
 	void init_config(); 
-	void restore_config(); 
+	void restore_config();
+	void write_config();
 
 	void add_image_sub_panel(const wxString& caption);
 	void add_graph_sub_panel(const wxString& caption); 

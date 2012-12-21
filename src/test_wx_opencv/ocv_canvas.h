@@ -4,6 +4,7 @@
 #include "wx/wx.h" 
 #include "wx/dcbuffer.h"
 #include "prerequisites.h"
+#include "image.h"
 
 enum e_img_mode
 {
@@ -19,42 +20,45 @@ public:
 	c_ocv_canvas(wxWindow *parent, 
 		wxWindowID id = wxID_ANY,
 		const wxPoint& pos = wxDefaultPosition, 
-		const wxSize& size = wxSize(10, 10), 
+		const wxSize& size = wxDefaultSize, 
 		long style = wxHSCROLL | wxVSCROLL, 
 		const wxString& name = _T("OpenCV Image")); 
-	
-	virtual void on_init();
-	virtual void on_paint(wxPaintEvent& event);
-	virtual void on_erase_background(wxEraseEvent& event);
-	virtual void on_size(wxSizeEvent& event); 
-
-	int load_image(const wxString& img_file);
-	void unload_image(); 
-	bool is_current_valid() const; 
+	 
+	/// Drawing methods
 	void draw_cv_img(wxDC& dc, ocv_mat_ptr& ocv_img); 
 	void draw_blank(wxDC& dc); 
 
-	void set_img_mode(e_img_mode mode) {m_img_mode = mode;}
-	e_img_mode get_img_mode() const { return m_img_mode; }
-	wxSize get_img_dimension() const { return wxSize(m_img_width, m_img_height); }
+	void set_img_idx(e_image_idx img_idx) { m_img_index = img_idx; }
+	void set_thumbnail_flag(bool is_thunmnail) { m_is_thunmnail = is_thunmnail; set_update_flag(true); }
+	void set_update_flag(bool need_update) { m_need_update = need_update; }
 
-private: 
-	 
-	/// Image Data
-	ocv_mat_ptr m_ocv_org_img; 
-	ocv_mat_ptr m_ocv_gray;	
-	// wxbitmap_ptr m_wx_bitmap; 
+	e_image_idx get_img_idx() const { return m_img_index; }
+	bool need_update() const { return m_need_update; }
+	bool is_thunmnail() const { return m_is_thunmnail; }
+	bool is_img_loaded() const;
+
+protected:
+
+	virtual void on_paint(wxPaintEvent& event);
+	virtual void on_erase_background(wxEraseEvent& event);
+	virtual void on_size(wxSizeEvent& event);  
+	virtual void on_left_dclick(wxMouseEvent& event);
+
+	void open_image(const wxString& img_file); 
 	
-	/// Image Properties
-	wxString m_img_path; 
-	int m_img_size;
-	int m_img_width, m_img_height; 
-	int m_img_bpp; 
+private: 
+	
+	/// Image Index
+	e_image_idx m_img_index; 
 
 	/// View 
 	float m_zoom_factor; 
 	wxCoord m_draw_pos_x, m_draw_pos_y; 
-	e_img_mode m_img_mode;
+
+	/// Flags 
+	bool m_need_update; 
+	bool m_is_thunmnail;
+	bool m_img_loaded; 
 
 	DECLARE_EVENT_TABLE() 
 };

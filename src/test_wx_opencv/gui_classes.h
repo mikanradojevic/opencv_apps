@@ -96,11 +96,6 @@ class OverviewFrame : public wxFrame
 		wxMenuBar* mOverviewFrameMenuBar;
 		wxMenu* mFileMenu;
 		wxMenu* mHelpMenu;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void on_close( wxCloseEvent& event ) { event.Skip(); }
-		virtual void on_size( wxSizeEvent& event ) { event.Skip(); }
-		
 	
 	public:
 		
@@ -129,7 +124,7 @@ class OverviewImgSubPanel : public wxPanel
 	
 	public:
 		
-		OverviewImgSubPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,150 ), long style = wxRAISED_BORDER|wxSIMPLE_BORDER|wxSTATIC_BORDER|wxSUNKEN_BORDER|wxTAB_TRAVERSAL ); 
+		OverviewImgSubPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxRAISED_BORDER|wxSIMPLE_BORDER|wxSTATIC_BORDER|wxSUNKEN_BORDER|wxTAB_TRAVERSAL ); 
 		~OverviewImgSubPanel();
 	
 };

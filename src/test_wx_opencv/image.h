@@ -26,22 +26,23 @@ public:
 
 	ocv_mat_ptr load_from_file(const std::string& file_name, e_image_idx idx, int flag = CV_LOAD_IMAGE_GRAYSCALE); 
 	void unload(e_image_idx idx); 
-	void release_all() {} 
-
-	ocv_mat_ptr get_origin_image(e_image_idx idx); 
-	ocv_mat_ptr get_hist(e_image_idx idx); 
+	void release_all() {}; 
+	ocv_mat_ptr resize_img(e_image_idx img, cv::Size& size, int interpolation = cv::INTER_LINEAR); 
 
 	bool is_image_valid(e_image_idx idx) 
 	{
-		return !(m_origin_imgs[idx].empty()); 
+		return !(m_grayscale_imgs[idx].empty()); 
 	}
 
+	ocv_mat_ptr get_grayscale_img(e_image_idx idx);
+	ocv_mat_ptr get_hist(e_image_idx idx);
+	
 private: 
 	void calculate_hist(e_image_idx idx); 
 
 	std::vector<std::string> m_img_paths;
-	std::vector<ocv_mat_ptr> m_origin_imgs;
-	std::vector<ocv_mat_ptr> m_hist; 
+	std::vector<ocv_mat_ptr> m_grayscale_imgs;
+	std::vector<ocv_mat_ptr> m_hists; 
 };
 
 static c_ocv_image_manager* get_ocv_img_mgr()

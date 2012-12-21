@@ -154,18 +154,10 @@ OverviewFrame::OverviewFrame( wxWindow* parent, wxWindowID id, const wxString& t
 	
 	
 	this->Centre( wxBOTH );
-	
-	// Connect Events
-	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( OverviewFrame::on_close ) );
-	this->Connect( wxEVT_SIZE, wxSizeEventHandler( OverviewFrame::on_size ) );
 }
 
 OverviewFrame::~OverviewFrame()
 {
-	// Disconnect Events
-	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( OverviewFrame::on_close ) );
-	this->Disconnect( wxEVT_SIZE, wxSizeEventHandler( OverviewFrame::on_size ) );
-	
 }
 
 OverviewImgSubPanel::OverviewImgSubPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
@@ -173,21 +165,22 @@ OverviewImgSubPanel::OverviewImgSubPanel( wxWindow* parent, wxWindowID id, const
 	wxStaticBoxSizer* imgSubPanelBoxSizer;
 	imgSubPanelBoxSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Images") ), wxHORIZONTAL );
 	
-	m_img_canvas_left = new c_ocv_canvas( this, wxID_ANY, wxDefaultPosition, wxSize( 200,200 ), wxHSCROLL|wxSIMPLE_BORDER|wxVSCROLL );
+	m_img_canvas_left = new c_ocv_canvas( this, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxHSCROLL|wxSIMPLE_BORDER|wxVSCROLL );
 	m_img_canvas_left->SetScrollRate( 5, 5 );
 	imgSubPanelBoxSizer->Add( m_img_canvas_left, 1, wxEXPAND | wxALL, 5 );
 	
-	m_img_canvas_mid = new c_ocv_canvas( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxSIMPLE_BORDER|wxVSCROLL );
+	m_img_canvas_mid = new c_ocv_canvas( this, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxHSCROLL|wxSIMPLE_BORDER|wxVSCROLL );
 	m_img_canvas_mid->SetScrollRate( 5, 5 );
 	imgSubPanelBoxSizer->Add( m_img_canvas_mid, 1, wxEXPAND | wxALL, 5 );
 	
-	m_img_canvas_right = new c_ocv_canvas( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxSIMPLE_BORDER|wxVSCROLL );
+	m_img_canvas_right = new c_ocv_canvas( this, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxHSCROLL|wxSIMPLE_BORDER|wxVSCROLL );
 	m_img_canvas_right->SetScrollRate( 5, 5 );
 	imgSubPanelBoxSizer->Add( m_img_canvas_right, 1, wxEXPAND | wxALL, 5 );
 	
 	
 	this->SetSizer( imgSubPanelBoxSizer );
 	this->Layout();
+	imgSubPanelBoxSizer->Fit( this );
 	
 	// Connect Events
 	this->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( OverviewImgSubPanel::on_left_dbl_clk ) );

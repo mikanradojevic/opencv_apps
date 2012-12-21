@@ -7,8 +7,11 @@
 #include "ocv_canvas.h"
 
 static const wxString APP_NAME = wxT("LensCorrectionApp"); 
-static const wxString FRAME_WIDTH_CONFIG_KEY = wxT("/ui_config/frame_width");
-static const wxString FRAME_HEIGHT_CONFIG_KEY = wxT("/ui_config/frame_height"); 
+static const wxString UI_CONFIG_PATH = wxT("/ui_config");
+static const wxString FRAME_WIDTH_CONFIG_KEY = UI_CONFIG_PATH + wxT("/frame_width");
+static const wxString FRAME_HEIGHT_CONFIG_KEY = UI_CONFIG_PATH + wxT("/frame_height"); 
+static const wxString FRAME_POS_X_CONFIG_KEY = UI_CONFIG_PATH + wxT("/frame_posx");
+static const wxString FRAME_POS_Y_CONFIG_KEY = UI_CONFIG_PATH + wxT("/frame_posy");
 
 c_overview_img_panel::c_overview_img_panel(wxWindow *parent, 
 										wxWindowID id, 
@@ -18,8 +21,16 @@ c_overview_img_panel::c_overview_img_panel(wxWindow *parent,
 										: OverviewImgSubPanel(parent, id, pos, size, style)
 										, m_img_loaded(false)
 { 
+	m_img_canvas_left->set_img_idx(k_left_image); 
+	m_img_canvas_left->set_thumbnail_flag(true);
 
-}
+	m_img_canvas_mid->set_img_idx(k_mid_image);
+	m_img_canvas_mid->set_thumbnail_flag(true);
+	
+	m_img_canvas_right->set_img_idx(k_right_image);
+	m_img_canvas_right->set_thumbnail_flag(true); 
+	 
+} 
 
 /*
 void c_overview_img_panel::on_left_dbl_clk( wxMouseEvent& event )
@@ -112,20 +123,9 @@ c_overview_frame::c_overview_frame(wxWindow *parent,
 	restore_config();
 }
 
-void c_overview_frame::on_close( wxCloseEvent& event )
-{ 
-	wxSize frame_size = GetSize(); 
-	
-	// Write the size of windows to config
-	wxFileConfig::Get()->Write(FRAME_WIDTH_CONFIG_KEY, frame_size.GetWidth()); 
-	wxFileConfig::Get()->Write(FRAME_HEIGHT_CONFIG_KEY, frame_size.GetHeight()); 
-
-	OverviewFrame::OnCloseWindow(event);
-}
-
-void c_overview_frame::on_size( wxSizeEvent& event )
+c_overview_frame::~c_overview_frame()
 {
-	event.Skip(); 
+	write_config(); 
 }
 
 void c_overview_frame::add_image_sub_panel(const wxString& caption)
@@ -133,14 +133,16 @@ void c_overview_frame::add_image_sub_panel(const wxString& caption)
 	c_overview_img_panel *img_panel = new c_overview_img_panel(this); 
 
 	wxBoxSizer *box_sizer = static_cast<wxBoxSizer*>(GetSizer());
-	wxSizerFlags sizer_flags(0); 
-	sizer_flags.Expand().Border(10);
+	wxSizerFlags sizer_flags(1); 
+	sizer_flags.Expand().Border(20);
 	box_sizer->Add(img_panel, sizer_flags); 
 	box_sizer->Layout(); 
 }
 
 void c_overview_frame::add_graph_sub_panel(const wxString& caption)
 {
+	
+
 	
 }
 
@@ -153,12 +155,31 @@ void c_overview_frame::init_config()
 
 void c_overview_frame::restore_config()
 {
-	// Read the config file
+	// Read the size of the main frame
 	double frame_width = 0;
 	double frame_height = 0; 
-	wxFileConfig::Get()->SetPath(wxT("/ui_config"));
-	wxFileConfig::Get()->Read(wxT("frame_width"), &frame_width); 
-	wxFileConfig::Get()->Read(wxT("frame_height"), &frame_height); 
-
+	wxFileConfig::Get()->Read(FRAME_WIDTH_CONFIG_KEY, &frame_width); 
+	wxFileConfig::Get()->Read(FRAME_HEIGHT_CONFIG_KEY, &frame_height); 
 	SetSize(frame_width, frame_height); 
+
+	// Read the position of the main frame on screen 
+	double frame_posx = 0;
+	double frame_posy = 0;
+	wxFileConfig::Get()->Read(FRAME_POS_X_CONFIG_KEY, &frame_posx);
+	wxFileConfig::Get()->Read(FRAME_POS_Y_CONFIG_KEY, &frame_posy);
+	SetPosition(wxPoint(frame_posx, frame_posy));
+
+}
+
+void c_overview_frame::write_config()
+{
+	// Write the size of windows to config
+	wxSize frame_size = GetSize(); 
+	wxFileConfig::Get()->Write(FRAME_WIDTH_CONFIG_KEY, frame_size.GetWidth()); 
+	wxFileConfig::Get()->Write(FRAME_HEIGHT_CONFIG_KEY, frame_size.GetHeight()); 
+
+	// Write the position of main frame
+	wxPoint frame_pos = GetPosition();
+	wxFileConfig::Get()->Write(FRAME_POS_X_CONFIG_KEY, frame_pos.x);
+	wxFileConfig::Get()->Write(FRAME_POS_Y_CONFIG_KEY, frame_pos.y);
 }

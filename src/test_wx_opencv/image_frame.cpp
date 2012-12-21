@@ -36,6 +36,7 @@ void c_image_frame::on_menu_exit( wxCommandEvent& event )
 
 void c_image_frame::open_image(const wxString& img_file)
 {
+	/*
 	int err = m_ocv_canvas->load_image(img_file);
 	if (err)
 	{
@@ -56,6 +57,7 @@ void c_image_frame::open_image(const wxString& img_file)
 		SetMinSize(new_frame_size);
 		SetMaxSize(new_frame_size);
 	}
+	*/
 }
  
 

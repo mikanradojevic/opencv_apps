@@ -696,7 +696,7 @@
             <event name="OnAuiPaneRestore"></event>
             <event name="OnAuiRender"></event>
             <event name="OnChar"></event>
-            <event name="OnClose">on_close</event>
+            <event name="OnClose"></event>
             <event name="OnEnterWindow"></event>
             <event name="OnEraseBackground"></event>
             <event name="OnHibernate"></event>
@@ -720,7 +720,7 @@
             <event name="OnRightDown"></event>
             <event name="OnRightUp"></event>
             <event name="OnSetFocus"></event>
-            <event name="OnSize">on_size</event>
+            <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
             <object class="wxBoxSizer" expanded="1">
                 <property name="minimum_size"></property>
@@ -850,7 +850,7 @@
             <property name="minimum_size"></property>
             <property name="name">OverviewImgSubPanel</property>
             <property name="pos"></property>
-            <property name="size">500,150</property>
+            <property name="size">-1,-1</property>
             <property name="subclass"></property>
             <property name="tooltip"></property>
             <property name="window_extra_style"></property>
@@ -944,7 +944,7 @@
                         <property name="scroll_rate_x">5</property>
                         <property name="scroll_rate_y">5</property>
                         <property name="show">1</property>
-                        <property name="size">200,200</property>
+                        <property name="size">-1,-1</property>
                         <property name="subclass">c_ocv_canvas; ocv_canvas.h</property>
                         <property name="toolbar_pane">0</property>
                         <property name="tooltip"></property>
@@ -1026,7 +1026,7 @@
                         <property name="scroll_rate_x">5</property>
                         <property name="scroll_rate_y">5</property>
                         <property name="show">1</property>
-                        <property name="size"></property>
+                        <property name="size">-1,-1</property>
                         <property name="subclass">c_ocv_canvas; ocv_canvas.h</property>
                         <property name="toolbar_pane">0</property>
                         <property name="tooltip"></property>
@@ -1108,7 +1108,7 @@
                         <property name="scroll_rate_x">5</property>
                         <property name="scroll_rate_y">5</property>
                         <property name="show">1</property>
-                        <property name="size"></property>
+                        <property name="size">-1,-1</property>
                         <property name="subclass">c_ocv_canvas; ocv_canvas.h</property>
                         <property name="toolbar_pane">0</property>
                         <property name="tooltip"></property>
