@@ -11,6 +11,7 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 class c_ocv_canvas;
+class mpWindow;
 
 #include <wx/scrolwin.h>
 #include <wx/gdicmn.h>
@@ -137,6 +138,9 @@ class OverviewGraphSubPanel  : public wxPanel
 	private:
 	
 	protected:
+		mpWindow* m_graph_wnd_left;
+		mpWindow* m_graph_wnd_mid;
+		mpWindow* m_graph_wnd_right;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void on_paint( wxPaintEvent& event ) { event.Skip(); }
@@ -144,7 +148,7 @@ class OverviewGraphSubPanel  : public wxPanel
 	
 	public:
 		
-		OverviewGraphSubPanel ( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL ); 
+		OverviewGraphSubPanel ( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
 		~OverviewGraphSubPanel ();
 	
 };

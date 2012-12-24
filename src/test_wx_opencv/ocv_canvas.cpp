@@ -9,7 +9,12 @@ BEGIN_EVENT_TABLE(c_ocv_canvas, wxScrolledWindow)
 	EVT_SIZE(c_ocv_canvas::on_size)
 	EVT_LEFT_DCLICK(c_ocv_canvas::on_left_dclick)			// Mouse left double-click 
 END_EVENT_TABLE()
-	
+
+/// Custom event type
+DEFINE_EVENT_TYPE(wxEVT_IMG_LOADED_CMD)
+
+//////////////////////////////////////////////////////////////////////////
+
 c_ocv_canvas::c_ocv_canvas(wxWindow *parent, 
 	wxWindowID id /* = wxID_ANY */, 
 	const wxPoint& pos /* = wxDefaultPosition */, 
@@ -112,6 +117,7 @@ void c_ocv_canvas::open_image(const wxString& img_file)
 	/// Load the image using the c_ocv_image_manager
 	std::string file_name = wxstr_to_std(img_file);
 	ocv_mat_ptr new_img = get_ocv_img_mgr()->load_from_file(file_name, m_img_index);
+	ocv_mat_ptr temp = get_ocv_img_mgr()->get_grayscale_img(m_img_index);
 
 	bool err = !new_img->data;  
 	// int err = m_ocv_canvas->load_image(img_file);
@@ -135,6 +141,8 @@ void c_ocv_canvas::open_image(const wxString& img_file)
 		SetMinSize(new_frame_size);
 		SetMaxSize(new_frame_size);
 		*/ 
+
+		fire_img_loaded_event();
 	}
 	
 	Refresh(true);
@@ -143,7 +151,15 @@ void c_ocv_canvas::open_image(const wxString& img_file)
 bool c_ocv_canvas::is_img_loaded() const
 {
 	ocv_mat_ptr img = get_ocv_img_mgr()->get_grayscale_img(m_img_index); 
-	return !img->empty() && (img->data); 
+	return !is_ptr_null(img) && (img->data); 
+}
+
+void c_ocv_canvas::fire_img_loaded_event()
+{
+	wxCommandEvent evt(wxEVT_IMG_LOADED_CMD, GetId()); 
+	wxWindow *overview_frame = GetParent()->GetParent();
+	wxWindow *overview_graph_panel = overview_frame->FindWindow(wxID_OVERVIEW_GRAPH_PANEL); 
+	wxPostEvent(overview_graph_panel, evt); 
 }
 
 //////////////////////////////////////////////////////////////////////////

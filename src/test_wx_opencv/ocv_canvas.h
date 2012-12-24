@@ -45,6 +45,7 @@ protected:
 	virtual void on_left_dclick(wxMouseEvent& event);
 
 	void open_image(const wxString& img_file); 
+	void fire_img_loaded_event(); 
 	
 private: 
 	

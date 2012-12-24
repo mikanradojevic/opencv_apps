@@ -5,6 +5,7 @@
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
+#include "mathplot.h"
 #include "ocv_canvas.h"
 
 #include "gui_classes.h"
@@ -197,12 +198,22 @@ OverviewImgSubPanel::~OverviewImgSubPanel()
 
 OverviewGraphSubPanel ::OverviewGraphSubPanel ( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
-	wxStaticBoxSizer* sbSizer1;
-	sbSizer1 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("label") ), wxVERTICAL );
+	wxStaticBoxSizer* graphSubPanelBoxSizer;
+	graphSubPanelBoxSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("graphs") ), wxHORIZONTAL );
+	
+	m_graph_wnd_left = new mpWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER|wxTAB_TRAVERSAL );
+	graphSubPanelBoxSizer->Add( m_graph_wnd_left, 1, wxEXPAND | wxALL, 5 );
+	
+	m_graph_wnd_mid = new mpWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER|wxTAB_TRAVERSAL );
+	graphSubPanelBoxSizer->Add( m_graph_wnd_mid, 1, wxEXPAND | wxALL, 5 );
+	
+	m_graph_wnd_right = new mpWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER|wxTAB_TRAVERSAL );
+	graphSubPanelBoxSizer->Add( m_graph_wnd_right, 1, wxEXPAND | wxALL, 5 );
 	
 	
-	this->SetSizer( sbSizer1 );
+	this->SetSizer( graphSubPanelBoxSizer );
 	this->Layout();
+	graphSubPanelBoxSizer->Fit( this );
 	
 	// Connect Events
 	this->Connect( wxEVT_PAINT, wxPaintEventHandler( OverviewGraphSubPanel ::on_paint ) );

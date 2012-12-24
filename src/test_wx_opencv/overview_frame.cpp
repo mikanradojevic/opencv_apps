@@ -11,7 +11,7 @@ static const wxString UI_CONFIG_PATH = wxT("/ui_config");
 static const wxString FRAME_WIDTH_CONFIG_KEY = UI_CONFIG_PATH + wxT("/frame_width");
 static const wxString FRAME_HEIGHT_CONFIG_KEY = UI_CONFIG_PATH + wxT("/frame_height"); 
 static const wxString FRAME_POS_X_CONFIG_KEY = UI_CONFIG_PATH + wxT("/frame_posx");
-static const wxString FRAME_POS_Y_CONFIG_KEY = UI_CONFIG_PATH + wxT("/frame_posy");
+static const wxString FRAME_POS_Y_CONFIG_KEY = UI_CONFIG_PATH + wxT("/frame_posy"); 
 
 c_overview_img_panel::c_overview_img_panel(wxWindow *parent, 
 										wxWindowID id, 
@@ -19,7 +19,6 @@ c_overview_img_panel::c_overview_img_panel(wxWindow *parent,
 										const wxSize& size, 
 										long style)
 										: OverviewImgSubPanel(parent, id, pos, size, style)
-										, m_img_loaded(false)
 { 
 	m_img_canvas_left->set_img_idx(k_left_image); 
 	m_img_canvas_left->set_thumbnail_flag(true);
@@ -29,72 +28,96 @@ c_overview_img_panel::c_overview_img_panel(wxWindow *parent,
 	
 	m_img_canvas_right->set_img_idx(k_right_image);
 	m_img_canvas_right->set_thumbnail_flag(true); 
-	 
 } 
 
-/*
-void c_overview_img_panel::on_left_dbl_clk( wxMouseEvent& event )
+//////////////////////////////////////////////////////////////////////////
+
+BEGIN_EVENT_TABLE(c_overview_graph_panel, OverviewGraphSubPanel)
+	EVT_CUSTOM(wxEVT_IMG_LOADED_CMD, wxID_ANY, c_overview_graph_panel::on_img_loaded)	
+END_EVENT_TABLE()
+
+c_overview_graph_panel::c_overview_graph_panel(wxWindow *parent, 
+											e_graph_type graph_type,
+											const wxString& title,  
+											wxWindowID id, 
+											const wxPoint& pos, 
+											const wxSize& size, 
+											long style)
+											: OverviewGraphSubPanel(parent, id, pos, size, style)
+											, m_graph_type(graph_type)
 {
-	wxString wildcard_str; 
-	wildcard_str += wxT("Image Files|*.jpg;*.tif|");
-	wildcard_str += wxT("TIFF (*.tif)|*.tif|");
-	wildcard_str += wxT("All Files (*.*)|*.*");
+	set_label_text(title);
+	update_graph();
+}
 
-	wxString str; 
-	str << wxT("Select image file to open!") << m_img_idx; 
-	wxFileDialog *file_dlg = new wxFileDialog(this, 
-											str, 
-											wxEmptyString, 
-											wxEmptyString, 
-											wildcard_str, 
-											wxFD_OPEN);
-	
-	if (file_dlg->ShowModal() == wxID_OK) 
-	{
-		open_image(file_dlg->GetPath()); 
-	}  
-} 
-*/
-
-void c_overview_img_panel::draw_panel(wxDC& dc)
+void c_overview_graph_panel::update_graph()
 {
-	
-} 
-
-/*
-void c_overview_img_panel::open_image(const wxString& img_file)
-{
-	/// Load the image using the c_ocv_image_manager
-	std::string file_name = wxstr_to_std(img_file);
-	ocv_mat_ptr new_img = get_ocv_img_mgr()->load_from_file(file_name, m_img_idx);
-	
-	bool err = !new_img->data;  
-	// int err = m_ocv_canvas->load_image(img_file);
-	if (err)
+	switch(m_graph_type)
 	{
-		std::stringstream ss; 
-		std::string err_str = wxstr_to_std(img_file);
-		ss << "Open file FAILEd!" << " " << err_str;
-		wx_log_error(ss.str().c_str()); 
-	}
-	else 
-	{
-		
-		wxSize img_dimension = m_ocv_canvas->get_img_dimension();
-		wxSize old_client_size = GetClientSize();
-		wxSize offset = wxSize(std::max(img_dimension.GetWidth() - old_client_size.GetWidth(), 0), 
-			std::max(img_dimension.GetHeight() - old_client_size.GetHeight(), 0));
-
-		wxSize new_frame_size = wxSize(GetSize().GetWidth() + offset.GetWidth() + 10, GetSize().GetHeight() + offset.GetHeight() + 10);
-		SetSize(new_frame_size); 
-		SetMinSize(new_frame_size);
-		SetMaxSize(new_frame_size);
-
-		m_img_loaded = true; 
+	case k_graph_histogram:
+		add_histograms(k_left_image); 
+		add_histograms(k_mid_image); 
+		add_histograms(k_right_image); 
+		break;
 	}
 }
-*/ 
 
+void c_overview_graph_panel::set_label_text(const wxString& label)
+{
+	wxStaticBoxSizer *static_box_sizer = static_cast<wxStaticBoxSizer*>(GetSizer());
+	wxStaticBox *static_box = static_box_sizer->GetStaticBox(); 
+	static_box->SetLabel(label); 
+}
+
+void c_overview_graph_panel::add_histograms(e_image_idx img_idx)
+{
+	bool is_valid = get_ocv_img_mgr()->is_image_valid(img_idx); 
+	
+	ocv_mat_ptr img = get_ocv_img_mgr()->get_grayscale_img(img_idx); 
+	if (!is_ptr_null(img))
+	{
+		ocv_mat_ptr hist_mat = get_ocv_img_mgr()->calc_grayscale_hist(img_idx); 
+		
+		wxString str = wxT("Histogram Mat: ");	
+		str << wxT("| cols: ") << hist_mat->cols; 
+		str << wxT("| rows: ") << hist_mat->rows;  
+		wxLogDebug(str);
+		
+		/// Prepare the histogram data
+		hist_data_vec hist_vec;
+		hist_mat_to_vector(hist_mat, hist_vec); 
+		c_histogram_layar *hist_layer = new c_histogram_layar(hist_vec);
+		double min_x = hist_layer->GetMinX(); 
+		double max_x = hist_layer->GetMaxX(); 
+		double min_y = hist_layer->GetMinY(); 
+		double max_y = hist_layer->GetMaxY(); 
+		
+		/// Setup the graph
+		wxFont graph_font(9, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+		mpScaleX *axis_x = new mpScaleX(wxT("X"), mpALIGN_BOTTOM, true, mpX_NORMAL);
+		mpScaleY *axis_y = new mpScaleY(wxT("Y"), mpALIGN_LEFT, true); 
+		axis_x->SetFont(graph_font);
+		axis_y->SetFont(graph_font);
+		axis_x->SetDrawOutsideMargins(false); 
+		axis_y->SetDrawOutsideMargins(false);
+		
+		m_graph_wnd_left->SetMargins(10, 10, 10, 10);
+		m_graph_wnd_left->AddLayer(axis_x);
+		m_graph_wnd_left->AddLayer(axis_y); 
+		m_graph_wnd_left->AddLayer(hist_layer);
+		m_graph_wnd_left->EnableDoubleBuffer(true);
+		m_graph_wnd_left->Fit(min_x, max_x, min_y, max_y); 
+		m_graph_wnd_left->UpdateAll();
+	} 
+}
+
+void c_overview_graph_panel::on_img_loaded(wxEvent& event)
+{
+	wxLogDebug(wxT("Image has been loaded!")); 
+	update_graph();
+
+	Refresh(true);
+}
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -119,7 +142,8 @@ c_overview_frame::c_overview_frame(wxWindow *parent,
 	m_log_wnd->Show();  
 
 	add_image_sub_panel(wxT("Images")); 
-	
+	add_graph_sub_panel(wxT("Histograms"), k_graph_histogram);
+
 	restore_config();
 }
 
@@ -130,7 +154,7 @@ c_overview_frame::~c_overview_frame()
 
 void c_overview_frame::add_image_sub_panel(const wxString& caption)
 {	
-	c_overview_img_panel *img_panel = new c_overview_img_panel(this); 
+	c_overview_img_panel *img_panel = new c_overview_img_panel(this, wxID_OVERVIEW_IMG_PANEL); 
 
 	wxBoxSizer *box_sizer = static_cast<wxBoxSizer*>(GetSizer());
 	wxSizerFlags sizer_flags(1); 
@@ -139,11 +163,15 @@ void c_overview_frame::add_image_sub_panel(const wxString& caption)
 	box_sizer->Layout(); 
 }
 
-void c_overview_frame::add_graph_sub_panel(const wxString& caption)
+void c_overview_frame::add_graph_sub_panel(const wxString& caption, e_graph_type graph_type)
 {
+	c_overview_graph_panel *graph_panel = new c_overview_graph_panel(this, graph_type, caption, wxID_OVERVIEW_GRAPH_PANEL);
 	
-
-	
+	wxBoxSizer *box_sizer = static_cast<wxBoxSizer*>(GetSizer());
+	wxSizerFlags sizer_flags(1); 
+	sizer_flags.Expand().Border(20);
+	box_sizer->Add(graph_panel, sizer_flags); 
+	box_sizer->Layout(); 
 }
 
 void c_overview_frame::init_config()

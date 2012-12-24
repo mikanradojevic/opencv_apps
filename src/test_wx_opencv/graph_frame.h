@@ -4,51 +4,7 @@
 #include <numeric>
 #include "prerequisites.h"
 #include "gui_classes.h" 
-#include "mathplot.h"
-
-class c_histogram_layar : public mpFX
-{
-public: 
-	c_histogram_layar(hist_data_vec& hist_data)
-		: mpFX(wxT("histogram figure"), mpALIGN_LEFT)
-		, m_hist_data(hist_data)
-	{
-		m_max_y = std::accumulate(m_hist_data.begin(), m_hist_data.end(), 0); 
-	}
-	
-	virtual double GetY(double x) 
-	{
-		unsigned int _x = (unsigned int)x;
-		if (_x < m_hist_data.size())
-			return (double)m_hist_data[_x]; 
-		else 
-			return 0; 
-	} 
-
-	virtual double GetMinX() 
-	{
-		return 0; 
-	}
-
-	virtual double GetMaxX() 
-	{
-		return (double)m_hist_data.size(); 
-	}
-
-	virtual double GetMinY()
-	{
-		return 0; 
-	}
-
-	virtual double GetMaxY() 
-	{
-		return m_max_y; 
-	}
-
-private:
-	hist_data_vec m_hist_data;  
-	int m_max_y; 
-};
+#include "mathplot.h" 
 
 //////////////////////////////////////////////////////////////////////////
 

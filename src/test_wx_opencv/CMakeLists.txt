@@ -65,6 +65,8 @@ set(UI_FILES
 	)
 	
 set(OTHER_SRC_FILES
+	graph.cpp
+	graph.h
 	image.cpp
 	image.h
 	utils.cpp
