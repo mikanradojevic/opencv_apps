@@ -78,37 +78,50 @@ void c_overview_graph_panel::add_histograms(e_image_idx img_idx)
 	{
 		ocv_mat_ptr hist_mat = get_ocv_img_mgr()->calc_grayscale_hist(img_idx); 
 		
-		wxString str = wxT("Histogram Mat: ");	
-		str << wxT("| cols: ") << hist_mat->cols; 
-		str << wxT("| rows: ") << hist_mat->rows;  
-		wxLogDebug(str);
-		
 		/// Prepare the histogram data
-		hist_data_vec hist_vec;
-		hist_mat_to_vector(hist_mat, hist_vec); 
-		c_histogram_layar *hist_layer = new c_histogram_layar(hist_vec);
-		double min_x = hist_layer->GetMinX(); 
-		double max_x = hist_layer->GetMaxX(); 
-		double min_y = hist_layer->GetMinY(); 
-		double max_y = hist_layer->GetMaxY(); 
+		hist_data_vec hist_data;
+		hist_mat_to_vector(hist_mat, hist_data);
 		
-		/// Setup the graph
-		wxFont graph_font(9, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-		mpScaleX *axis_x = new mpScaleX(wxT("X"), mpALIGN_BOTTOM, true, mpX_NORMAL);
-		mpScaleY *axis_y = new mpScaleY(wxT("Y"), mpALIGN_LEFT, true); 
-		axis_x->SetFont(graph_font);
-		axis_y->SetFont(graph_font);
-		axis_x->SetDrawOutsideMargins(false); 
-		axis_y->SetDrawOutsideMargins(false);
-		
-		m_graph_wnd_left->SetMargins(10, 10, 10, 10);
-		m_graph_wnd_left->AddLayer(axis_x);
-		m_graph_wnd_left->AddLayer(axis_y); 
-		m_graph_wnd_left->AddLayer(hist_layer);
-		m_graph_wnd_left->EnableDoubleBuffer(true);
-		m_graph_wnd_left->Fit(min_x, max_x, min_y, max_y); 
-		m_graph_wnd_left->UpdateAll();
+		switch (img_idx)
+		{
+		case k_left_image:
+			setup_hist_graph(m_graph_wnd_left, hist_data);
+			break;
+		case k_mid_image:
+			setup_hist_graph(m_graph_wnd_mid, hist_data); 
+			break; 
+		case k_right_image: 
+			setup_hist_graph(m_graph_wnd_right, hist_data);
+			break; 
+		} 
 	} 
+}
+
+void c_overview_graph_panel::setup_hist_graph(mpWindow *mp_wnd, hist_data_vec& hist_data)
+{
+	c_histogram_layar *hist_layer = new c_histogram_layar(hist_data);
+	double min_x = hist_layer->GetMinX(); 
+	double max_x = hist_layer->GetMaxX(); 
+	double min_y = hist_layer->GetMinY(); 
+	double max_y = hist_layer->GetMaxY(); 
+
+	/// Setup the graph
+	wxFont graph_font(9, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+	mpScaleX *axis_x = new mpScaleX(wxT("X"), mpALIGN_BOTTOM, true, mpX_NORMAL);
+	mpScaleY *axis_y = new mpScaleY(wxT("Y"), mpALIGN_LEFT, true); 
+	axis_x->SetFont(graph_font);
+	axis_y->SetFont(graph_font);
+	axis_x->SetDrawOutsideMargins(false); 
+	axis_y->SetDrawOutsideMargins(false);
+
+	mp_wnd->SetMargins(30, 10, 30, 60);
+	mp_wnd->AddLayer(axis_x);
+	mp_wnd->AddLayer(axis_y); 
+	mp_wnd->AddLayer(hist_layer);
+
+	mp_wnd->EnableDoubleBuffer(true);
+	mp_wnd->Fit(min_x, max_x, min_y, max_y); 
+	mp_wnd->UpdateAll(); 
 }
 
 void c_overview_graph_panel::on_img_loaded(wxEvent& event)

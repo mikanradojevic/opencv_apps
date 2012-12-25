@@ -37,9 +37,11 @@ public:
 	
 private: 
 	void add_histograms(e_image_idx img_idx);
+	void setup_hist_graph(mpWindow *mp_wnd, hist_data_vec& hist_data); 
 	void set_label_text(const wxString& label); 
 
 	e_graph_type m_graph_type; 
+	
 
 	DECLARE_EVENT_TABLE()
 };

@@ -50,6 +50,8 @@ public:
 		return m_max_y; 
 	}
 
+	virtual void Plot(wxDC & dc, mpWindow & w); 
+
 private:
 	hist_data_vec m_hist_data;  
 	int m_max_y; 
