@@ -6,6 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////
 
 #include "mathplot.h"
+#include "ocv_cam_canvas.h"
 #include "ocv_canvas.h"
 
 #include "gui_classes.h"
@@ -224,4 +225,31 @@ OverviewGraphSubPanel ::~OverviewGraphSubPanel ()
 	// Disconnect Events
 	this->Disconnect( wxEVT_PAINT, wxPaintEventHandler( OverviewGraphSubPanel ::on_paint ) );
 	
+}
+
+OverviewVideoSubPanel::OverviewVideoSubPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxStaticBoxSizer* videoSubPanelBoxSizer;
+	videoSubPanelBoxSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Cameras") ), wxHORIZONTAL );
+	
+	m_cam_canvas_left = new c_ocv_cam_canvas( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxSIMPLE_BORDER|wxVSCROLL );
+	m_cam_canvas_left->SetScrollRate( 5, 5 );
+	videoSubPanelBoxSizer->Add( m_cam_canvas_left, 1, wxEXPAND | wxALL, 5 );
+	
+	m_cam_canvas_mid = new c_ocv_cam_canvas( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxSIMPLE_BORDER|wxVSCROLL );
+	m_cam_canvas_mid->SetScrollRate( 5, 5 );
+	videoSubPanelBoxSizer->Add( m_cam_canvas_mid, 1, wxEXPAND | wxALL, 5 );
+	
+	m_cam_canvas_right = new c_ocv_cam_canvas( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxSIMPLE_BORDER|wxVSCROLL );
+	m_cam_canvas_right->SetScrollRate( 5, 5 );
+	videoSubPanelBoxSizer->Add( m_cam_canvas_right, 1, wxEXPAND | wxALL, 5 );
+	
+	
+	this->SetSizer( videoSubPanelBoxSizer );
+	this->Layout();
+	videoSubPanelBoxSizer->Fit( this );
+}
+
+OverviewVideoSubPanel::~OverviewVideoSubPanel()
+{
 }

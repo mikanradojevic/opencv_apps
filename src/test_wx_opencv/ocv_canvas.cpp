@@ -178,7 +178,8 @@ void c_ocv_canvas::draw_cv_img(wxDC& dc, ocv_mat_ptr& ocv_img)
 	*/
 	
 	cv::Mat temp = resized_img->clone();
-	cvtColor(*resized_img, temp, CV_GRAY2BGR); 
+	//cvtColor(*resized_img, temp, CV_GRAY2BGR); 
+	cvtColor(*resized_img, temp, CV_RGB2BGR); 
 	wxImage wx_img(temp.cols, temp.rows, temp.data, true); 
 	wxBitmap wx_bitmap(wx_img);
 	

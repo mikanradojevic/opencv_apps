@@ -43,8 +43,8 @@ public:
 	virtual double GetMinY()
 	{
 		return 0; 
-	}
-
+	} 
+	
 	virtual double GetMaxY() 
 	{
 		return m_max_y; 
@@ -55,6 +55,47 @@ public:
 private:
 	hist_data_vec m_hist_data;  
 	int m_max_y; 
+};
+
+//////////////////////////////////////////////////////////////////////////
+
+class c_mtf_layer : public mpFX
+{
+public: 
+	c_mtf_layer(mtf_data_vec& mtf_data)
+		: mpFX(wxT("MTF figure"), mpALIGN_LEFT)
+		, m_mtf_data(mtf_data)
+	{}
+
+	virtual double GetMinX()
+	{
+		return 0; 
+	}
+
+	virtual double GetMaxX()
+	{
+		return m_mtf_data.size(); 
+	}
+	
+	virtual double GetMinY() 
+	{
+		return 0; 
+	}
+
+	virtual double GetMaxY()
+	{
+		return 255; 
+	}
+
+	virtual double GetY( double x )
+	{
+		return 0;
+	}
+	
+	virtual void Plot(wxDC & dc, mpWindow & w); 
+
+private:
+	mtf_data_vec m_mtf_data; 
 };
 
 #endif

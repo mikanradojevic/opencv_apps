@@ -10,6 +10,7 @@
 
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
+class c_ocv_cam_canvas;
 class c_ocv_canvas;
 class mpWindow;
 
@@ -150,6 +151,25 @@ class OverviewGraphSubPanel  : public wxPanel
 		
 		OverviewGraphSubPanel ( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
 		~OverviewGraphSubPanel ();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class OverviewVideoSubPanel
+///////////////////////////////////////////////////////////////////////////////
+class OverviewVideoSubPanel : public wxPanel 
+{
+	private:
+	
+	protected:
+		c_ocv_cam_canvas* m_cam_canvas_left;
+		c_ocv_cam_canvas* m_cam_canvas_mid;
+		c_ocv_cam_canvas* m_cam_canvas_right;
+	
+	public:
+		
+		OverviewVideoSubPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~OverviewVideoSubPanel();
 	
 };
 

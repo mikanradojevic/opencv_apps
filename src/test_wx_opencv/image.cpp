@@ -82,6 +82,19 @@ ocv_mat_ptr c_ocv_image_manager::calc_grayscale_hist(e_image_idx idx)
 	return hist_mat; 
 }
 
+void c_ocv_image_manager::calc_mtf(e_image_idx idx, const cv::Point2i& p1, const cv::Point2i& p2, mtf_data_vec& mtf_data)
+{
+	ocv_mat_ptr img = m_grayscale_imgs[idx];
+	cv::LineIterator it(*img, p1, p2, 8, true);
+	mtf_data.clear(); 
+
+	for (int i = 0; i < it.count; ++i, ++it)
+	{
+		float v = img->at<float>(it.pos());
+		mtf_data.push_back((unsigned char)v);
+	} 
+}
+
 ocv_mat_ptr c_ocv_image_manager::resize_img(e_image_idx img, cv::Size& size, int interpolation /* = cv::INTER_LINEAR */)
 {
 	ocv_mat_ptr src_img = get_grayscale_img(img);
@@ -101,6 +114,15 @@ ocv_mat_ptr c_ocv_image_manager::get_grayscale_img(e_image_idx idx)
 		return  ocv_mat_ptr(); 
 	else
 		return m_grayscale_imgs[idx];
+}
+
+ocv_mat_ptr c_ocv_image_manager::new_greyscale_img(e_image_idx img_idx, int width, int height)
+{
+	if (get_grayscale_img(img_idx) == ocv_mat_ptr()) 
+	{
+		m_grayscale_imgs[img_idx].reset(new cv::Mat(width, height, CV_8UC1));
+	}
+	return get_grayscale_img(img_idx);
 }
 
 //////////////////////////////////////////////////////////////////////////

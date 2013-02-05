@@ -48,3 +48,10 @@ void c_histogram_layar::Plot(wxDC & dc, mpWindow & w)
 
 	}
 }
+
+//////////////////////////////////////////////////////////////////////////
+
+void c_mtf_layer::Plot(wxDC & dc, mpWindow & w)
+{
+	mpFX::Plot(dc, w); 	
+}

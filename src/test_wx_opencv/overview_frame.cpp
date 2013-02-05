@@ -5,6 +5,8 @@
 #include "overview_frame.h" 
 #include "utils.h"
 #include "ocv_canvas.h"
+#include "ocv_cam_canvas.h"
+#include "video_capture.h"
 
 static const wxString APP_NAME = wxT("LensCorrectionApp"); 
 static const wxString UI_CONFIG_PATH = wxT("/ui_config");
@@ -12,6 +14,24 @@ static const wxString FRAME_WIDTH_CONFIG_KEY = UI_CONFIG_PATH + wxT("/frame_widt
 static const wxString FRAME_HEIGHT_CONFIG_KEY = UI_CONFIG_PATH + wxT("/frame_height"); 
 static const wxString FRAME_POS_X_CONFIG_KEY = UI_CONFIG_PATH + wxT("/frame_posx");
 static const wxString FRAME_POS_Y_CONFIG_KEY = UI_CONFIG_PATH + wxT("/frame_posy"); 
+
+c_overview_cam_panel::c_overview_cam_panel(wxWindow *parent, 
+										wxWindowID id /* = wxID_ANY */, 
+										const wxPoint& pos /* = wxDefaultPosition */, 
+										const wxSize& size /* = wxDefaultSize */, 
+										long style /* = wxTAB_TRAVERSAL */)
+										: OverviewVideoSubPanel(parent, id, pos, size, style)
+{
+	get_videocap_mgr()->get_ocv_videocap(k_left_image)->open(0);
+	
+	m_cam_canvas_left->set_videocap_idx(k_left_image); 
+	m_cam_canvas_left->active_render_loop(true); 
+	m_cam_canvas_mid->set_videocap_idx(k_mid_image); 
+	m_cam_canvas_right->set_videocap_idx(k_right_image);
+}
+
+
+//////////////////////////////////////////////////////////////////////////
 
 c_overview_img_panel::c_overview_img_panel(wxWindow *parent, 
 										wxWindowID id, 
@@ -59,6 +79,10 @@ void c_overview_graph_panel::update_graph()
 		add_histograms(k_mid_image); 
 		add_histograms(k_right_image); 
 		break;
+
+	case k_graph_mtf:
+		
+		break;
 	}
 }
 
@@ -70,9 +94,7 @@ void c_overview_graph_panel::set_label_text(const wxString& label)
 }
 
 void c_overview_graph_panel::add_histograms(e_image_idx img_idx)
-{
-	bool is_valid = get_ocv_img_mgr()->is_image_valid(img_idx); 
-	
+{	
 	ocv_mat_ptr img = get_ocv_img_mgr()->get_grayscale_img(img_idx); 
 	if (!is_ptr_null(img))
 	{
@@ -97,6 +119,12 @@ void c_overview_graph_panel::add_histograms(e_image_idx img_idx)
 	} 
 }
 
+void c_overview_graph_panel::add_mtf(e_image_idx img_idx)
+{
+	
+	
+}
+
 void c_overview_graph_panel::setup_hist_graph(mpWindow *mp_wnd, hist_data_vec& hist_data)
 {
 	c_histogram_layar *hist_layer = new c_histogram_layar(hist_data);
@@ -118,6 +146,33 @@ void c_overview_graph_panel::setup_hist_graph(mpWindow *mp_wnd, hist_data_vec& h
 	mp_wnd->AddLayer(axis_x);
 	mp_wnd->AddLayer(axis_y); 
 	mp_wnd->AddLayer(hist_layer);
+
+	mp_wnd->EnableDoubleBuffer(true);
+	mp_wnd->Fit(min_x, max_x, min_y, max_y);
+	mp_wnd->UpdateAll(); 
+}
+
+void c_overview_graph_panel::setup_mtf_graph(mpWindow *mp_wnd, mtf_data_vec& mtf_data)
+{
+	c_mtf_layer *mtf_layer = new c_mtf_layer(mtf_data);
+	double min_x = mtf_layer->GetMinX(); 
+	double max_x = mtf_layer->GetMaxX(); 
+	double min_y = mtf_layer->GetMinY(); 
+	double max_y = mtf_layer->GetMaxY(); 
+	
+	/// Setup the graph
+	wxFont graph_font(9, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+	mpScaleX *axis_x = new mpScaleX(wxT("X"), mpALIGN_BOTTOM, true, mpX_NORMAL);
+	mpScaleY *axis_y = new mpScaleY(wxT("Y"), mpALIGN_LEFT, true); 
+	axis_x->SetFont(graph_font);
+	axis_y->SetFont(graph_font);
+	axis_x->SetDrawOutsideMargins(false); 
+	axis_y->SetDrawOutsideMargins(false);
+
+	mp_wnd->SetMargins(30, 10, 30, 60);
+	mp_wnd->AddLayer(axis_x);
+	mp_wnd->AddLayer(axis_y); 
+	mp_wnd->AddLayer(mtf_layer); 
 
 	mp_wnd->EnableDoubleBuffer(true);
 	mp_wnd->Fit(min_x, max_x, min_y, max_y); 
@@ -154,6 +209,7 @@ c_overview_frame::c_overview_frame(wxWindow *parent,
 	m_log_wnd->GetFrame()->SetSize(650, 800); 
 	m_log_wnd->Show();  
 
+	add_cam_sub_panel(wxT("Camera"));
 	add_image_sub_panel(wxT("Images")); 
 	add_graph_sub_panel(wxT("Histograms"), k_graph_histogram);
 
@@ -185,6 +241,17 @@ void c_overview_frame::add_graph_sub_panel(const wxString& caption, e_graph_type
 	sizer_flags.Expand().Border(20);
 	box_sizer->Add(graph_panel, sizer_flags); 
 	box_sizer->Layout(); 
+}
+
+void c_overview_frame::add_cam_sub_panel(const wxString& caption)
+{
+	c_overview_cam_panel *cam_panel = new c_overview_cam_panel(this, wxID_OVERVIEW_CAM_FRAME); 
+	
+	wxBoxSizer *box_sizer = static_cast<wxBoxSizer*>(GetSizer());
+	wxSizerFlags sizer_flags(1); 
+	sizer_flags.Expand().Border(20);
+	box_sizer->Add(cam_panel, sizer_flags); 
+	box_sizer->Layout();
 }
 
 void c_overview_frame::init_config()

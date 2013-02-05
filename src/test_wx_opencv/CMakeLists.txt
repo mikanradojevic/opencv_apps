@@ -60,6 +60,8 @@ set(UI_FILES
 	overview_frame.h
 	ocv_canvas.cpp
 	ocv_canvas.h
+	ocv_cam_canvas.cpp
+	ocv_cam_canvas.h
 	gui_classes.cpp
 	gui_classes.h 
 	)
@@ -71,6 +73,8 @@ set(OTHER_SRC_FILES
 	image.h
 	utils.cpp
 	utils.h
+	video_capture.cpp
+	video_capture.h
 	)
 	
 if(WIN32)

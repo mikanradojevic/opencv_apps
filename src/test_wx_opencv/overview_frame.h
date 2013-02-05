@@ -3,8 +3,21 @@
 
 #include "wx/log.h"
 #include "gui_classes.h"
+#include "prerequisites.h"
 #include "image.h"
-#include "graph.h" 
+#include "graph.h"
+
+class c_overview_cam_panel : public OverviewVideoSubPanel
+{
+public: 
+	c_overview_cam_panel(wxWindow *parent,  
+						wxWindowID id = wxID_ANY,
+						const wxPoint& pos = wxDefaultPosition, 
+						const wxSize& size = wxDefaultSize, 
+						long style = wxTAB_TRAVERSAL); 	
+};
+
+//////////////////////////////////////////////////////////////////////////
 
 class c_overview_img_panel : public OverviewImgSubPanel
 {
@@ -37,7 +50,10 @@ public:
 	
 private: 
 	void add_histograms(e_image_idx img_idx);
+	void add_mtf(e_image_idx img_idx);
+
 	void setup_hist_graph(mpWindow *mp_wnd, hist_data_vec& hist_data); 
+	void setup_mtf_graph(mpWindow *mp_wnd, mtf_data_vec& mtf_data); 
 	void set_label_text(const wxString& label); 
 
 	e_graph_type m_graph_type; 
@@ -70,8 +86,10 @@ private:
 	void restore_config();
 	void write_config();
 
+	void add_cam_sub_panel(const wxString& caption); 
 	void add_image_sub_panel(const wxString& caption);
 	void add_graph_sub_panel(const wxString& caption, e_graph_type graph_type); 
+
 	wxLogWindow *m_log_wnd; 
 };
 
