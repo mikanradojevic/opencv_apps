@@ -232,17 +232,50 @@ OverviewVideoSubPanel::OverviewVideoSubPanel( wxWindow* parent, wxWindowID id, c
 	wxStaticBoxSizer* videoSubPanelBoxSizer;
 	videoSubPanelBoxSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Cameras") ), wxHORIZONTAL );
 	
+	wxStaticBoxSizer* sbSizerCamLeft;
+	sbSizerCamLeft = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Left") ), wxVERTICAL );
+	
 	m_cam_canvas_left = new c_ocv_cam_canvas( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxSIMPLE_BORDER|wxVSCROLL );
 	m_cam_canvas_left->SetScrollRate( 5, 5 );
-	videoSubPanelBoxSizer->Add( m_cam_canvas_left, 1, wxEXPAND | wxALL, 5 );
+	sbSizerCamLeft->Add( m_cam_canvas_left, 1, wxEXPAND | wxALL, 5 );
 	
-	m_cam_canvas_mid = new c_ocv_cam_canvas( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxSIMPLE_BORDER|wxVSCROLL );
-	m_cam_canvas_mid->SetScrollRate( 5, 5 );
-	videoSubPanelBoxSizer->Add( m_cam_canvas_mid, 1, wxEXPAND | wxALL, 5 );
+	m_btn_capture_left = new wxButton( this, wxID_ANY, wxT("Capture"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_btn_capture_left->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
+	
+	sbSizerCamLeft->Add( m_btn_capture_left, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	videoSubPanelBoxSizer->Add( sbSizerCamLeft, 1, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizerCamMid;
+	sbSizerCamMid = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Mid") ), wxVERTICAL );
 	
 	m_cam_canvas_right = new c_ocv_cam_canvas( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxSIMPLE_BORDER|wxVSCROLL );
 	m_cam_canvas_right->SetScrollRate( 5, 5 );
-	videoSubPanelBoxSizer->Add( m_cam_canvas_right, 1, wxEXPAND | wxALL, 5 );
+	sbSizerCamMid->Add( m_cam_canvas_right, 1, wxEXPAND | wxALL, 5 );
+	
+	m_btn_capture_mid = new wxButton( this, wxID_ANY, wxT("Capture"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_btn_capture_mid->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
+	
+	sbSizerCamMid->Add( m_btn_capture_mid, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	videoSubPanelBoxSizer->Add( sbSizerCamMid, 1, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizerCamRight;
+	sbSizerCamRight = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Right") ), wxVERTICAL );
+	
+	m_cam_canvas_mid = new c_ocv_cam_canvas( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxSIMPLE_BORDER|wxVSCROLL );
+	m_cam_canvas_mid->SetScrollRate( 5, 5 );
+	sbSizerCamRight->Add( m_cam_canvas_mid, 1, wxEXPAND | wxALL, 5 );
+	
+	m_btn_capture_right = new wxButton( this, wxID_ANY, wxT("Capture"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_btn_capture_right->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
+	
+	sbSizerCamRight->Add( m_btn_capture_right, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	videoSubPanelBoxSizer->Add( sbSizerCamRight, 1, wxEXPAND, 5 );
 	
 	
 	this->SetSizer( videoSubPanelBoxSizer );

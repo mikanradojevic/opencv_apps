@@ -30,6 +30,7 @@ class mpWindow;
 #include <wx/frame.h>
 #include <wx/statbox.h>
 #include <wx/panel.h>
+#include <wx/button.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -163,8 +164,11 @@ class OverviewVideoSubPanel : public wxPanel
 	
 	protected:
 		c_ocv_cam_canvas* m_cam_canvas_left;
-		c_ocv_cam_canvas* m_cam_canvas_mid;
+		wxButton* m_btn_capture_left;
 		c_ocv_cam_canvas* m_cam_canvas_right;
+		wxButton* m_btn_capture_mid;
+		c_ocv_cam_canvas* m_cam_canvas_mid;
+		wxButton* m_btn_capture_right;
 	
 	public:
 		

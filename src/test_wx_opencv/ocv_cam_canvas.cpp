@@ -48,7 +48,6 @@ c_ocv_cam_canvas::c_ocv_cam_canvas(wxWindow *parent,
 								, m_render_loop_on(false)
 { 
 	m_render_timer = new c_render_timer(this); 
-	// m_render_timer->start();
 }
 
 c_ocv_cam_canvas::~c_ocv_cam_canvas()
