@@ -30,6 +30,24 @@ c_overview_cam_panel::c_overview_cam_panel(wxWindow *parent,
 	m_cam_canvas_right->set_videocap_idx(k_right_image);
 }
 
+void c_overview_cam_panel::on_capture_click_left( wxCommandEvent& event )
+{
+	ocv_mat_ptr img = m_cam_canvas_left->get_current_frame();
+	
+	
+}
+
+void c_overview_cam_panel::on_capture_click_mid( wxCommandEvent& event ) 
+{
+	
+	
+}
+
+void c_overview_cam_panel::on_capture_click_right( wxCommandEvent& event )
+{ 
+	
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 

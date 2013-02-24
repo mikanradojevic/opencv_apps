@@ -15,6 +15,10 @@ public:
 						const wxPoint& pos = wxDefaultPosition, 
 						const wxSize& size = wxDefaultSize, 
 						long style = wxTAB_TRAVERSAL); 	
+
+	virtual void on_capture_click_left( wxCommandEvent& event ); 
+	virtual void on_capture_click_mid( wxCommandEvent& event );
+	virtual void on_capture_click_right( wxCommandEvent& event ); 
 };
 
 //////////////////////////////////////////////////////////////////////////

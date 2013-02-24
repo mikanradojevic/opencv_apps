@@ -1630,7 +1630,7 @@
                                 <property name="font"></property>
                                 <property name="gripper">0</property>
                                 <property name="hidden">0</property>
-                                <property name="id">wxID_ANY</property>
+                                <property name="id">wxID_BTN_CAPTURE_LEFT</property>
                                 <property name="label">Capture</property>
                                 <property name="max_size"></property>
                                 <property name="maximize_button">0</property>
@@ -1660,7 +1660,7 @@
                                 <property name="window_extra_style"></property>
                                 <property name="window_name"></property>
                                 <property name="window_style"></property>
-                                <event name="OnButtonClick"></event>
+                                <event name="OnButtonClick">on_capture_left_click</event>
                                 <event name="OnChar"></event>
                                 <event name="OnEnterWindow"></event>
                                 <event name="OnEraseBackground"></event>
@@ -1814,7 +1814,7 @@
                                 <property name="font"></property>
                                 <property name="gripper">0</property>
                                 <property name="hidden">0</property>
-                                <property name="id">wxID_ANY</property>
+                                <property name="id">wxID_BTN_CAPTURE_MID</property>
                                 <property name="label">Capture</property>
                                 <property name="max_size"></property>
                                 <property name="maximize_button">0</property>
@@ -1844,7 +1844,7 @@
                                 <property name="window_extra_style"></property>
                                 <property name="window_name"></property>
                                 <property name="window_style"></property>
-                                <event name="OnButtonClick"></event>
+                                <event name="OnButtonClick">on_capture_click_mid</event>
                                 <event name="OnChar"></event>
                                 <event name="OnEnterWindow"></event>
                                 <event name="OnEraseBackground"></event>
@@ -1998,7 +1998,7 @@
                                 <property name="font"></property>
                                 <property name="gripper">0</property>
                                 <property name="hidden">0</property>
-                                <property name="id">wxID_ANY</property>
+                                <property name="id">wxID_BTN_CAPTURE_RIGHT</property>
                                 <property name="label">Capture</property>
                                 <property name="max_size"></property>
                                 <property name="maximize_button">0</property>
@@ -2028,7 +2028,7 @@
                                 <property name="window_extra_style"></property>
                                 <property name="window_name"></property>
                                 <property name="window_style"></property>
-                                <event name="OnButtonClick"></event>
+                                <event name="OnButtonClick">on_capture_click_right</event>
                                 <event name="OnChar"></event>
                                 <event name="OnEnterWindow"></event>
                                 <event name="OnEraseBackground"></event>

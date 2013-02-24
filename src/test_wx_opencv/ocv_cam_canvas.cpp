@@ -48,6 +48,7 @@ c_ocv_cam_canvas::c_ocv_cam_canvas(wxWindow *parent,
 								, m_render_loop_on(false)
 { 
 	m_render_timer = new c_render_timer(this); 
+	m_current_frame = get_ocv_img_mgr()->add_grayscale_img("cam_img", 0, 0);
 }
 
 c_ocv_cam_canvas::~c_ocv_cam_canvas()
@@ -73,24 +74,14 @@ void c_ocv_cam_canvas::draw_captured(wxDC& dc)
 		return; 
 
 	videocap_mgr->get_ocv_videocap(m_videocap_idx)->grab();
-	
-	/*
-	ocv_mat_ptr image = get_ocv_img_mgr()->get_grayscale_img(m_videocap_idx);
-	if (image == ocv_mat_ptr()) 
-	{
-		// Create a new greyscale image
-		wxSize client_size = GetClientSize();
-		get_ocv_img_mgr()->new_greyscale_img(m_videocap_idx, client_size.GetWidth(), client_size.GetHeight());
-		image = get_ocv_img_mgr()->get_grayscale_img(m_videocap_idx);
-	}
-	*/
-	cv::Mat frame; 
+
+	// cv::Mat frame; 
 	cv::Mat resized;
-	videocap_mgr->get_ocv_videocap(m_videocap_idx)->retrieve(frame); 
+	videocap_mgr->get_ocv_videocap(m_videocap_idx)->retrieve(*m_current_frame); 
 
 	wxSize client_size = GetClientSize();
 	cv::Size cv_size(client_size.GetWidth(), client_size.GetHeight());
-	cv::resize(frame, resized, cv_size, 0.0, 0.0, cv::INTER_LINEAR);
+	cv::resize(*m_current_frame, resized, cv_size, 0.0, 0.0, cv::INTER_LINEAR);
 	
 	cv::Mat temp = resized.clone();
 	//cvtColor(*resized_img, temp, CV_GRAY2BGR); 
@@ -98,13 +89,13 @@ void c_ocv_cam_canvas::draw_captured(wxDC& dc)
 	wxImage wx_img(temp.cols, temp.rows, temp.data, true); 
 	wxBitmap wx_bitmap(wx_img);
 	
-	// Draw the bitmap
+	// Draw the bitmap 
 	dc.DrawBitmap(wx_bitmap, 0, 0); 
 }
 
 void c_ocv_cam_canvas::on_idle(wxIdleEvent& event)
 {
-	if (m_render_loop_on)
+	if (m_render_loop_on) 
 	{
 		draw_now(); 
 		event.RequestMore();
@@ -118,7 +109,7 @@ void c_ocv_cam_canvas::draw_now()
 	draw_captured(dc); 
 }
 
-void c_ocv_cam_canvas::active_render_loop(bool on)
+void c_ocv_cam_canvas::active_render_loop(bool on) 
 {
 	if (on && !m_render_loop_on) 
 	{
@@ -130,3 +121,7 @@ void c_ocv_cam_canvas::active_render_loop(bool on)
 	}
 }
 
+ocv_mat_ptr c_ocv_cam_canvas::get_current_frame() 
+{
+	return m_current_frame; 
+}

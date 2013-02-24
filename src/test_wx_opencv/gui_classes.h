@@ -34,6 +34,9 @@ class mpWindow;
 
 ///////////////////////////////////////////////////////////////////////////
 
+#define wxID_BTN_CAPTURE_LEFT 1000
+#define wxID_BTN_CAPTURE_MID 1001
+#define wxID_BTN_CAPTURE_RIGHT 1002
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class ImageFrame
@@ -169,6 +172,12 @@ class OverviewVideoSubPanel : public wxPanel
 		wxButton* m_btn_capture_mid;
 		c_ocv_cam_canvas* m_cam_canvas_mid;
 		wxButton* m_btn_capture_right;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void on_capture_left_click( wxCommandEvent& event ) { event.Skip(); }
+		virtual void on_capture_click_mid( wxCommandEvent& event ) { event.Skip(); }
+		virtual void on_capture_click_right( wxCommandEvent& event ) { event.Skip(); }
+		
 	
 	public:
 		

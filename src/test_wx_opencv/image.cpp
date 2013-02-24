@@ -49,7 +49,7 @@ ocv_mat_ptr c_ocv_image_manager::load_from_file(const std::string& file_name, e_
 void c_ocv_image_manager::unload(e_image_idx idx)
 {
 	if (is_image_valid(idx))
-	{
+	{ 
 		/*
 		m_grayscale_imgs[idx].delete_obj();
 		m_hists[idx].delete_obj(); 
@@ -57,6 +57,16 @@ void c_ocv_image_manager::unload(e_image_idx idx)
 		ptr_delete(m_grayscale_imgs[idx]);
 		ptr_delete(m_hists[idx]); 
 	}
+}
+
+void c_ocv_image_manager::unload_util_img(const std::string& name) 
+{
+	name_img_map::iterator it = m_util_imgs.find(name);
+	if (it != m_util_imgs.end()) 
+	{
+		ptr_delete(it->second);
+		m_util_imgs.erase(it);
+	} 
 }
 
 ocv_mat_ptr c_ocv_image_manager::calc_grayscale_hist(e_image_idx idx)
@@ -123,7 +133,29 @@ ocv_mat_ptr c_ocv_image_manager::new_greyscale_img(e_image_idx img_idx, int widt
 		m_grayscale_imgs[img_idx].reset(new cv::Mat(width, height, CV_8UC1));
 	}
 	return get_grayscale_img(img_idx);
+} 
+
+ocv_mat_ptr c_ocv_image_manager::new_grayscale_img(int width, int height)
+{
+	if (width < 0 || height < 0)
+		return ocv_mat_ptr(); 
+	
+	ocv_mat_ptr new_img;
+	new_img.reset(new cv::Mat(width, height, CV_8UC1));
+	return new_img; 
 }
+
+ocv_mat_ptr c_ocv_image_manager::add_grayscale_img(const std::string& name, int width, int height)
+{
+	name_img_map::iterator it = m_util_imgs.find(name);
+	if (it != m_util_imgs.end()) 
+	{
+		return it->second; 
+	} 
+	ocv_mat_ptr new_img = new_grayscale_img(width, height); 
+	m_util_imgs.insert(std::pair<std::string, ocv_mat_ptr>(name, new_img)); 
+	return new_img; 
+} 
 
 //////////////////////////////////////////////////////////////////////////
 

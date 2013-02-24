@@ -12,21 +12,25 @@ ocv_mat_ptr equalize_hist(ocv_mat_ptr src_hist);
 
 class c_ocv_image_manager
 {
+	typedef std::map<std::string, ocv_mat_ptr> name_img_map;
+	
 public: 
 	c_ocv_image_manager();
 	~c_ocv_image_manager();
 
+	ocv_mat_ptr add_grayscale_img(const std::string& name, int width, int height);  
 	ocv_mat_ptr new_greyscale_img(e_image_idx img_idx, int width, int height); 
 
 	ocv_mat_ptr load_from_file(const std::string& file_name, e_image_idx idx, int flag = CV_LOAD_IMAGE_GRAYSCALE); 
-	void unload(e_image_idx idx); 
+	void unload(e_image_idx idx);
+	void unload_util_img(const std::string& name);
+	
 	void release_all() {}; 
 	ocv_mat_ptr resize_img(e_image_idx img, cv::Size& size, int interpolation = cv::INTER_LINEAR); 
 	ocv_mat_ptr calc_grayscale_hist(e_image_idx idx); 
 	void calc_mtf(e_image_idx idx, const cv::Point2i& p1, const cv::Point2i& p2, mtf_data_vec& mtf_data);
 	
-	
-	bool is_image_valid(e_image_idx idx) 
+	bool is_image_valid(e_image_idx idx)
 	{
 		return !(is_ptr_null(m_grayscale_imgs[idx])); 
 	}
@@ -34,11 +38,16 @@ public:
 	ocv_mat_ptr get_grayscale_img(e_image_idx idx);
 	ocv_mat_ptr get_hist(e_image_idx idx);
 	
+private:
+	ocv_mat_ptr new_grayscale_img(int width, int height);  
+
 private: 
 	
 	std::vector<std::string> m_img_paths;
 	std::vector<ocv_mat_ptr> m_grayscale_imgs;
 	std::vector<ocv_mat_ptr> m_hists; 
+
+	name_img_map m_util_imgs; 
 };
 
 extern c_ocv_image_manager* get_ocv_img_mgr(); 

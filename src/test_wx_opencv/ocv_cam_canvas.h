@@ -21,6 +21,8 @@ public:
 	int get_videocap_idx() const { return m_videocap_idx; }
 	void set_videocap_idx(e_image_idx videocap_idx) { m_videocap_idx = videocap_idx; }
 	void active_render_loop(bool on);
+
+	ocv_mat_ptr get_current_frame(); 
 	
 protected: 
 
@@ -35,6 +37,9 @@ private:
 
 	// Rendering Timer 
 	c_render_timer *m_render_timer; 
+
+	// Current frame of image from camera 
+	ocv_mat_ptr m_current_frame; 
 	
 	bool m_render_loop_on;
 	
