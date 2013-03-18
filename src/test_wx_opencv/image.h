@@ -7,49 +7,64 @@
 #include "opencv2/opencv.hpp" 
 #include "prerequisites.h"
 
-int hist_mat_to_vector(ocv_mat_ptr hist, hist_data_vec& hist_vec); 
-ocv_mat_ptr equalize_hist(ocv_mat_ptr src_hist); 
+/**,
+	OpenCV image maintainer 
+	Ocv image includes RGB/Grayscale images, histogram and other data matrix 
+*/
+
+const std::string LEFT_IMG = "left_image"; 
+const std::string MID_IMG = "mid_image"; 
+const std::string RIGHT_IMG = "right_image"; 
+
+const int DEFAULT_IMG_SiZE = 1; 
 
 class c_ocv_image_manager
 {
-	typedef std::map<std::string, ocv_mat_ptr> name_img_map;
+	typedef std::map<std::string, ocv_mat_ptr> images_map;
+	typedef std::map<std::string, ocv_mat_ptr> hist_map;  
 	
 public: 
 	c_ocv_image_manager();
 	~c_ocv_image_manager();
+ 
+	// Add an image to the manager
+	int add_image(const std::string& name, ocv_mat_ptr img); 
+	// Remove an image 
+	int remvove_image(const std::string& name, ocv_mat_ptr img); 
+	// Find an image
+	ocv_mat_ptr find_image_by_name(const std::string& name); 
 
-	ocv_mat_ptr add_grayscale_img(const std::string& name, int width, int height);  
-	ocv_mat_ptr new_greyscale_img(e_image_idx img_idx, int width, int height); 
-
-	ocv_mat_ptr load_from_file(const std::string& file_name, e_image_idx idx, int flag = CV_LOAD_IMAGE_GRAYSCALE); 
-	void unload(e_image_idx idx);
-	void unload_util_img(const std::string& name);
+private:  
 	
-	void release_all() {}; 
-	ocv_mat_ptr resize_img(e_image_idx img, cv::Size& size, int interpolation = cv::INTER_LINEAR); 
-	ocv_mat_ptr calc_grayscale_hist(e_image_idx idx); 
-	void calc_mtf(e_image_idx idx, const cv::Point2i& p1, const cv::Point2i& p2, mtf_data_vec& mtf_data);
-	
-	bool is_image_valid(e_image_idx idx)
-	{
-		return !(is_ptr_null(m_grayscale_imgs[idx])); 
-	}
+	images_map m_image_dict; 
+	hist_map m_hist_dict; 
 
-	ocv_mat_ptr get_grayscale_img(e_image_idx idx);
-	ocv_mat_ptr get_hist(e_image_idx idx);
-	
-private:
-	ocv_mat_ptr new_grayscale_img(int width, int height);  
-
-private: 
-	
-	std::vector<std::string> m_img_paths;
-	std::vector<ocv_mat_ptr> m_grayscale_imgs;
-	std::vector<ocv_mat_ptr> m_hists; 
-
-	name_img_map m_util_imgs; 
 };
-
 extern c_ocv_image_manager* get_ocv_img_mgr(); 
+
+/////////////////////////////////////////////////////////////////////////
+
+// Create an empty ocv image 
+ocv_mat_ptr make_ocv_image(unsigned int width, unsigned int height, int flag = CV_8UC1);
+
+// Delete an image from memory 
+void delete_ocv_image(ocv_mat_ptr& img);
+
+// Resize the image
+ocv_mat_ptr resize_image(ocv_mat_ptr& src_img, cv::Size& size, int interpolation = cv::INTER_LINEAR);
+
+// Calcuate the histogram 
+ocv_mat_ptr calc_hist(ocv_mat_ptr& src_img);
+
+// Calculate MTF
+void calc_mtf(ocv_mat_ptr& image, const cv::Point2i& p1, const cv::Point2i& p2, mtf_data_vec& mtf_data); 
+
+// Check an image	
+bool is_image_valid(ocv_mat_ptr& img);  
+
+// 
+int hist_mat_to_vector(ocv_mat_ptr hist, hist_data_vec& hist_vec); 
+
+ocv_mat_ptr equalize_hist(ocv_mat_ptr src_hist); 
 
 #endif

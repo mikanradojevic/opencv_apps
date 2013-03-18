@@ -5,9 +5,11 @@
 
 BEGIN_EVENT_TABLE(c_ocv_canvas, wxScrolledWindow) 
 	EVT_PAINT(c_ocv_canvas::on_paint) 
-	// EVT_ERASE_BACKGROUND(c_ocv_canvas::on_erase_background) 
 	EVT_SIZE(c_ocv_canvas::on_size)
 	EVT_LEFT_DCLICK(c_ocv_canvas::on_left_dclick)			// Mouse left double-click 
+	EVT_LEFT_UP(c_ocv_canvas::on_left_up)
+	EVT_LEFT_DOWN(c_ocv_canvas::on_left_down)
+	EVT_MOTION(c_ocv_canvas::on_motion)
 END_EVENT_TABLE()
 
 /// Custom event type
@@ -22,13 +24,20 @@ c_ocv_canvas::c_ocv_canvas(wxWindow *parent,
 	long style /* = wxHSCROLL | wxVSCROLL */, 
 	const wxString& name /* = "OpenCV Image" */)
 	: wxScrolledWindow(parent, id, pos, size, style, name)
-	, m_zoom_factor(1.0f)
-	, m_draw_pos_x(0), m_draw_pos_y(0) 
-	, m_img_index(k_left_image)
-	, m_need_update(true)
-	, m_is_thunmnail(true) 
-	, m_img_loaded(false)
+	, m_is_thumbnail(true)
+	, m_update(true)
+	, m_draw_line(false)
+	, m_using_line_tool(false)
 {
+}
+
+void c_ocv_canvas::set_image(ocv_mat_ptr image, const std::string& name) 
+{
+	m_img = image; 
+	m_name = name;
+	m_update = true;
+
+	Update(); 
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -40,20 +49,19 @@ void c_ocv_canvas::on_paint(wxPaintEvent& event)
 	wxPaintDC dc(this);
 	PrepareDC(dc);
 
-	if (m_need_update)
+	if (m_update && is_image_valid(m_img))
 	{
-		if (is_img_loaded())
-		{
-			ocv_mat_ptr img = get_ocv_img_mgr()->get_grayscale_img(m_img_index); 
-			draw_cv_img(dc, img); 
-		} 
-		else 
-		{
-			draw_blank(dc);
-		}
+		draw_cv_img(dc, m_img);
+		m_update = false;
+	} 
+	else if (is_image_valid(m_img))
+	{
+		draw_blank(dc); 
 	}
-	set_update_flag(false);
+
+	draw_line(dc); 
 } 
+
 
 
 void c_ocv_canvas::on_erase_background(wxEraseEvent& event)
@@ -62,20 +70,8 @@ void c_ocv_canvas::on_erase_background(wxEraseEvent& event)
 
 void c_ocv_canvas::on_size(wxSizeEvent& event)
 {
-	if (m_is_thunmnail)
-	{
-		set_update_flag(true); 
-	}
-	else 
-	{
-		/*
-		wxSize wnd_size = event.GetSize(); 
-		int img_display_width = m_img_width * m_zoom_factor; 
-		int img_display_height = m_img_height * m_zoom_factor; 
-		m_draw_pos_x= (wxCoord)((wnd_size.x - img_display_width) * 0.5f); 
-		m_draw_pos_y = (wxCoord)((wnd_size.y - img_display_height) * 0.5f);
-		*/
-	}
+	/*
+	m_update = true; 
 
 	// event.Skip(); 
 	wxScrolledWindow::OnSize(event);
@@ -85,81 +81,63 @@ void c_ocv_canvas::on_size(wxSizeEvent& event)
 	str << wnd_size.GetWidth(); 
 	str << wxT(", ");
 	str << wnd_size.GetHeight();
-	wxLogDebug(str);
+	wxLogDebug(str); 
+	*/
+
+	m_update = true; 
+	wxScrolledWindow::OnSize(event);
+	// event.Skip(); 
 }
 
 void c_ocv_canvas::on_left_dclick(wxMouseEvent& event)
+{ 
+} 
+
+void c_ocv_canvas::on_left_down( wxMouseEvent& event )
 {
-	wxString wildcard_str; 
-	wildcard_str += wxT("Image Files|*.jpg;*.tif|");
-	wildcard_str += wxT("TIFF (*.tif)|*.tif|");
-	wildcard_str += wxT("All Files (*.*)|*.*");
+	wxPoint pt = event.GetPosition(); 
+	wxRect client_rect = GetClientRect(); 
 
-	wxString str; 
-	str << wxT("Select image file to open!");  
-	wxFileDialog *file_dlg = new wxFileDialog(this, 
-		str, 
-		wxEmptyString, 
-		wxEmptyString, 
-		wildcard_str, 
-		wxFD_OPEN);
-
-	if (file_dlg->ShowModal() == wxID_OK) 
+	if (pt.x < client_rect.width && pt.y < client_rect.height) 
 	{
-		open_image(file_dlg->GetPath()); 
-	}  
-}
-
-////////////////////////////////////////////////////////////////////////// 
-
-void c_ocv_canvas::open_image(const wxString& img_file)
-{
-	/// Load the image using the c_ocv_image_manager
-	std::string file_name = wxstr_to_std(img_file);
-	ocv_mat_ptr new_img = get_ocv_img_mgr()->load_from_file(file_name, m_img_index);
-	ocv_mat_ptr temp = get_ocv_img_mgr()->get_grayscale_img(m_img_index);
-
-	bool err = !new_img->data;  
-	// int err = m_ocv_canvas->load_image(img_file);
-	if (err)
-	{
-		std::stringstream ss; 
-		std::string err_str = wxstr_to_std(img_file);
-		ss << "Open file FAILEd!" << " " << err_str;
-		wx_log_error(ss.str().c_str()); 
+		wxLogMessage(wxT("mouse down")); 
+		m_line_start = pt; 
+		m_using_line_tool = true; 
+		m_draw_line = false; 
 	}
-	else 
+}
+
+void c_ocv_canvas::on_left_up( wxMouseEvent& event ) 
+{	
+	wxPoint pt = event.GetPosition(); 
+	wxRect client_rect = GetClientRect(); 
+
+	if (pt.x < client_rect.width && pt.y < client_rect.height) 
 	{
-		/*
-		wxSize img_dimension = get_img_dimension();
-		wxSize old_client_size = GetClientSize();
-		wxSize offset = wxSize(std::max(img_dimension.GetWidth() - old_client_size.GetWidth(), 0), 
-			std::max(img_dimension.GetHeight() - old_client_size.GetHeight(), 0));
-
-		wxSize new_frame_size = wxSize(GetSize().GetWidth() + offset.GetWidth() + 10, GetSize().GetHeight() + offset.GetHeight() + 10);
-		SetSize(new_frame_size); 
-		SetMinSize(new_frame_size);
-		SetMaxSize(new_frame_size);
-		*/ 
-
-		fire_img_loaded_event();
+		wxLogMessage(wxT("mouse up")); 
+		m_line_end = pt; 
+		m_using_line_tool = false; 
+		m_draw_line = true; 
+		Update(); 
 	}
-	
-	Refresh(true);
 }
 
-bool c_ocv_canvas::is_img_loaded() const
+void c_ocv_canvas::on_motion(wxMouseEvent& event)
 {
-	ocv_mat_ptr img = get_ocv_img_mgr()->get_grayscale_img(m_img_index); 
-	return !is_ptr_null(img) && (img->data); 
-}
+	wxPoint pt = event.GetPosition(); 
+	wxRect client_rect = GetClientRect(); 
 
-void c_ocv_canvas::fire_img_loaded_event()
-{
-	wxCommandEvent evt(wxEVT_IMG_LOADED_CMD, GetId()); 
-	wxWindow *overview_frame = GetParent()->GetParent();
-	wxWindow *overview_graph_panel = overview_frame->FindWindow(wxID_OVERVIEW_GRAPH_PANEL); 
-	wxPostEvent(overview_graph_panel, evt); 
+	if (pt.x < client_rect.width && pt.y < client_rect.height) 
+	{ 
+		wxLogMessage(wxT("mouse motion")); 
+		m_current_mouse_pt = pt; 
+		if (m_using_line_tool) 
+		{
+			m_update = true; 
+			Refresh();
+			Update(); 
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -167,19 +145,35 @@ void c_ocv_canvas::fire_img_loaded_event()
 //////////////////////////////////////////////////////////////////////////
 
 void c_ocv_canvas::draw_cv_img(wxDC& dc, ocv_mat_ptr& ocv_img) 
-{
-	wxSize client_size = GetClientSize();
-	cv::Size cv_size(client_size.GetWidth(), client_size.GetHeight());
-	ocv_mat_ptr resized_img = get_ocv_img_mgr()->resize_img(m_img_index, cv_size); 
-
-	/*
-	imshow("Source Image", *(get_ocv_img_mgr()->get_grayscale_img(m_img_index))); 
-	imshow("Dest Image", *resized_img);
-	*/
-	
-	cv::Mat temp = resized_img->clone();
-	//cvtColor(*resized_img, temp, CV_GRAY2BGR); 
-	cvtColor(*resized_img, temp, CV_RGB2BGR); 
+{ 
+	cv::Mat temp;
+	cv::Mat resized_img;
+	if (m_is_thumbnail) 
+	{
+		wxSize client_size = GetClientSize();
+		cv::Size cv_size(client_size.GetWidth(), client_size.GetHeight());
+		ocv_mat_ptr resized_img = resize_image(m_img, cv_size); 
+		temp = resized_img->clone(); 
+		if (m_is_rgb) 
+		{ 
+			cvtColor(*resized_img, temp, CV_RGB2BGR); 
+		} 
+		else 
+		{
+			cvtColor(*m_img, temp, CV_GRAY2BGR);
+		}
+	}
+	else
+	{
+		if (m_is_rgb) 
+		{ 
+			cvtColor(*m_img, temp, CV_RGB2BGR); 
+		} 
+		else 
+		{
+			cvtColor(*m_img, temp, CV_GRAY2BGR); 
+		}
+	}
 	wxImage wx_img(temp.cols, temp.rows, temp.data, true); 
 	wxBitmap wx_bitmap(wx_img);
 	
@@ -192,5 +186,21 @@ void c_ocv_canvas::draw_blank(wxDC& dc)
 	wxSize client_size = GetClientSize(); 
 
 	dc.SetBrush(*wxLIGHT_GREY_BRUSH); 
-	dc.DrawRectangle(0, 0, client_size.GetWidth(), client_size.GetHeight()); 
+	dc.DrawRectangle(0, 0, client_size.GetWidth(), client_size.GetHeight());  
 } 
+
+void c_ocv_canvas::draw_line(wxDC& dc)
+{
+	if (m_using_line_tool)
+	{
+		//wxLogMessage(wxT("drawing")); 
+		dc.SetPen( wxPen( wxColor(0,0,0), 3 ) ); // black line, 3 pixels thick
+		dc.DrawLine(m_line_start, m_current_mouse_pt);  
+	}
+
+	if (m_draw_line) 
+	{
+		dc.SetPen( wxPen( wxColor(0,0,0), 3 ) ); // black line, 3 pixels thick
+		dc.DrawLine(m_line_start, m_line_end); 
+	}
+}

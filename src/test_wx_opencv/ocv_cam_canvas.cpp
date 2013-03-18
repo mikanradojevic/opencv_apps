@@ -48,8 +48,10 @@ c_ocv_cam_canvas::c_ocv_cam_canvas(wxWindow *parent,
 								, m_render_loop_on(false)
 { 
 	m_render_timer = new c_render_timer(this); 
-	m_current_frame = get_ocv_img_mgr()->add_grayscale_img("cam_img", 0, 0);
-}
+	m_current_frame = make_ocv_image(1, 1); 
+	get_ocv_img_mgr()->add_image("cam_image", m_current_frame);
+	// m_current_frame = get_ocv_img_mgr()->add_grayscale_img("cam_img", 0, 0);
+} 
 
 c_ocv_cam_canvas::~c_ocv_cam_canvas()
 {
@@ -105,7 +107,7 @@ void c_ocv_cam_canvas::on_idle(wxIdleEvent& event)
 void c_ocv_cam_canvas::draw_now()
 {
 	wxClientDC dc(this);
-	// PrepareDC(dc);
+	// PrepareDC(dc); 
 	draw_captured(dc); 
 }
 

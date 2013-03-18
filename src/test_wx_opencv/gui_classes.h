@@ -10,9 +10,9 @@
 
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
+class c_graph_canvas;
 class c_ocv_cam_canvas;
 class c_ocv_canvas;
-class mpWindow;
 
 #include <wx/scrolwin.h>
 #include <wx/gdicmn.h>
@@ -57,9 +57,13 @@ class ImageFrame : public wxFrame
 		wxToolBar* mImageFrameToolBar;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void on_erase_background( wxEraseEvent& event ) { event.Skip(); }
+		virtual void on_paint( wxPaintEvent& event ) { event.Skip(); }
+		virtual void on_size( wxSizeEvent& event ) { event.Skip(); }
+		virtual void on_leave_window( wxMouseEvent& event ) { event.Skip(); }
 		virtual void on_menu_open( wxCommandEvent& event ) { event.Skip(); }
 		virtual void on_menu_exit( wxCommandEvent& event ) { event.Skip(); }
+		virtual void on_calc_mtf( wxCommandEvent& event ) { event.Skip(); }
+		virtual void on_calc_histogram( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
@@ -126,6 +130,9 @@ class OverviewImgSubPanel : public wxPanel
 		// Virtual event handlers, overide them in your derived class
 		virtual void on_left_dbl_clk( wxMouseEvent& event ) { event.Skip(); }
 		virtual void on_paint( wxPaintEvent& event ) { event.Skip(); }
+		virtual void on_left_img_thunmnail_double_click( wxMouseEvent& event ) { event.Skip(); }
+		virtual void on_mid_img_thunmnail_double_click( wxMouseEvent& event ) { event.Skip(); }
+		virtual void on_right_img_thunmnail_double_click( wxMouseEvent& event ) { event.Skip(); }
 		
 	
 	public:
@@ -143,9 +150,9 @@ class OverviewGraphSubPanel  : public wxPanel
 	private:
 	
 	protected:
-		mpWindow* m_graph_wnd_left;
-		mpWindow* m_graph_wnd_mid;
-		mpWindow* m_graph_wnd_right;
+		c_graph_canvas* m_graph_wnd_left;
+		c_graph_canvas* m_graph_wnd_mid;
+		c_graph_canvas* m_graph_wnd_right;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void on_paint( wxPaintEvent& event ) { event.Skip(); }

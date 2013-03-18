@@ -7,6 +7,8 @@
 #include "image.h"
 #include "graph.h"
 
+class c_overview_frame;
+
 class c_overview_cam_panel : public OverviewVideoSubPanel
 {
 public: 
@@ -16,9 +18,12 @@ public:
 						const wxSize& size = wxDefaultSize, 
 						long style = wxTAB_TRAVERSAL); 	
 
-	virtual void on_capture_click_left( wxCommandEvent& event ); 
+	virtual void on_capture_left_click( wxCommandEvent& event ); 
 	virtual void on_capture_click_mid( wxCommandEvent& event );
-	virtual void on_capture_click_right( wxCommandEvent& event ); 
+	virtual void on_capture_click_right( wxCommandEvent& event );
+
+private: 
+	c_overview_frame *m_overview_frame; 
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -31,8 +36,17 @@ public:
 						wxWindowID id = wxID_ANY,
 						const wxPoint& pos = wxDefaultPosition, 
 						const wxSize& size = wxDefaultSize, 
-						long style = wxTAB_TRAVERSAL); 
-};
+						long style = wxTAB_TRAVERSAL);
+	
+	c_ocv_canvas* get_ocv_canvas(e_image_idx img_idx);
+
+	virtual void on_left_img_thunmnail_double_click( wxMouseEvent& event); 
+	virtual void on_mid_img_thunmnail_double_click( wxMouseEvent& event ); 
+	virtual void on_right_img_thunmnail_double_click( wxMouseEvent& event ); 
+
+private:
+	c_overview_frame *m_overview_frame; 
+}; 
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -49,20 +63,14 @@ public:
 						long style = wxTAB_TRAVERSAL); 
 	
 	void update_graph(); 
-
 	void on_img_loaded(wxEvent& event); 
-	
-private: 
-	void add_histograms(e_image_idx img_idx);
-	void add_mtf(e_image_idx img_idx);
-
-	void setup_hist_graph(mpWindow *mp_wnd, hist_data_vec& hist_data); 
-	void setup_mtf_graph(mpWindow *mp_wnd, mtf_data_vec& mtf_data); 
+	void calculate_histogram(ocv_mat_ptr img, e_image_idx img_idx);
+	void calculate_mtf(ocv_mat_ptr img, e_image_idx img_idx, wxPoint& start, wxPoint& end); 
 	void set_label_text(const wxString& label); 
 
+private:
 	e_graph_type m_graph_type; 
 	
-
 	DECLARE_EVENT_TABLE()
 };
 
@@ -83,8 +91,11 @@ public:
 
 	virtual ~c_overview_frame(); 
 	
-protected:
-
+	c_overview_cam_panel* get_overview_cam_panel();
+	c_overview_img_panel* get_overview_img_panel(); 
+	c_overview_graph_panel* get_overview_graph_panel_hist();
+	c_overview_graph_panel* get_overview_graph_panel_mtf(); 
+	
 private: 
 	void init_config(); 
 	void restore_config();

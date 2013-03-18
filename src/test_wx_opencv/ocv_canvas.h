@@ -22,44 +22,46 @@ public:
 		const wxPoint& pos = wxDefaultPosition, 
 		const wxSize& size = wxDefaultSize, 
 		long style = wxHSCROLL | wxVSCROLL, 
-		const wxString& name = _T("OpenCV Image")); 
-	 
-	/// Drawing methods
-	void draw_cv_img(wxDC& dc, ocv_mat_ptr& ocv_img); 
-	void draw_blank(wxDC& dc); 
+		const wxString& name = _T("OpenCV Image"));  
+	
+	void set_image(ocv_mat_ptr image, const std::string& name); 
+	void show_image();
+	
+	void set_rgb(bool flag) { m_is_rgb = flag; }
+	void set_thumbnail(bool flag) { m_is_thumbnail = flag; } 
 
-	void set_img_idx(e_image_idx img_idx) { m_img_index = img_idx; }
-	void set_thumbnail_flag(bool is_thunmnail) { m_is_thunmnail = is_thunmnail; set_update_flag(true); }
-	void set_update_flag(bool need_update) { m_need_update = need_update; }
-
-	e_image_idx get_img_idx() const { return m_img_index; }
-	bool need_update() const { return m_need_update; }
-	bool is_thunmnail() const { return m_is_thunmnail; }
-	bool is_img_loaded() const;
+	bool is_line_ready() const { return m_draw_line; }
+	wxPoint get_line_start() const { return m_line_start; }
+	wxPoint get_line_end() const { return m_line_end; }
 
 protected:
+	void draw_blank(wxDC& dc); 
+	void draw_cv_img(wxDC& dc, ocv_mat_ptr& ocv_img); 
+	void draw_line(wxDC& dc);
 
 	virtual void on_paint(wxPaintEvent& event);
 	virtual void on_erase_background(wxEraseEvent& event);
 	virtual void on_size(wxSizeEvent& event);  
 	virtual void on_left_dclick(wxMouseEvent& event);
+	virtual void on_left_down( wxMouseEvent& event ); 
+	virtual void on_left_up( wxMouseEvent& event ); 
+	virtual void on_motion(wxMouseEvent& event);
 
-	void open_image(const wxString& img_file); 
-	void fire_img_loaded_event(); 
+
+private:
+	/// The image to be drawn
+	ocv_mat_ptr m_img; 
+	std::string m_name; 
 	
-private: 
-	
-	/// Image Index
-	e_image_idx m_img_index; 
+	/// Flags
+	bool m_is_thumbnail;
+	bool m_is_rgb; 
+	bool m_update; 
 
-	/// View 
-	float m_zoom_factor; 
-	wxCoord m_draw_pos_x, m_draw_pos_y; 
-
-	/// Flags 
-	bool m_need_update; 
-	bool m_is_thunmnail;
-	bool m_img_loaded; 
+	bool m_using_line_tool; 
+	bool m_draw_line; 
+	wxPoint m_line_start, m_line_end;
+	wxPoint m_current_mouse_pt;  
 
 	DECLARE_EVENT_TABLE() 
 };

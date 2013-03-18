@@ -65,7 +65,9 @@ public:
 	c_mtf_layer(mtf_data_vec& mtf_data)
 		: mpFX(wxT("MTF figure"), mpALIGN_LEFT)
 		, m_mtf_data(mtf_data)
-	{}
+	{
+		m_max_y = *std::max_element(m_mtf_data.begin(), m_mtf_data.end());
+	}
 
 	virtual double GetMinX()
 	{
@@ -84,18 +86,23 @@ public:
 
 	virtual double GetMaxY()
 	{
-		return 255; 
+		return m_max_y; 
 	}
 
 	virtual double GetY( double x )
 	{
-		return 0;
+		unsigned int _x = (unsigned int)x;
+		if (_x < m_mtf_data.size())
+			return (double)m_mtf_data[_x]; 
+		else 
+			return 0; 
 	}
 	
 	virtual void Plot(wxDC & dc, mpWindow & w); 
 
 private:
 	mtf_data_vec m_mtf_data; 
+	float m_max_y; 
 };
 
 #endif

@@ -60,6 +60,8 @@ set(UI_FILES
 	overview_frame.h
 	ocv_canvas.cpp
 	ocv_canvas.h
+	graph_canvas.cpp
+	graph_canvas.h
 	ocv_cam_canvas.cpp
 	ocv_cam_canvas.h
 	gui_classes.cpp

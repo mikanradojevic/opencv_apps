@@ -5,7 +5,7 @@
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#include "mathplot.h"
+#include "graph_canvas.h"
 #include "ocv_cam_canvas.h"
 #include "ocv_canvas.h"
 
@@ -45,6 +45,14 @@ ImageFrame::ImageFrame( wxWindow* parent, wxWindowID id, const wxString& title, 
 	mImageFrameMenuBar->Append( mViewMenu, wxT("View") ); 
 	
 	mImageMenu = new wxMenu();
+	wxMenuItem* m_calc_MTF;
+	m_calc_MTF = new wxMenuItem( mImageMenu, wxID_ANY, wxString( wxT("Calculate MTF") ) , wxEmptyString, wxITEM_NORMAL );
+	mImageMenu->Append( m_calc_MTF );
+	
+	wxMenuItem* m_calc_histogram;
+	m_calc_histogram = new wxMenuItem( mImageMenu, wxID_ANY, wxString( wxT("Calculate Histogram") ) , wxEmptyString, wxITEM_NORMAL );
+	mImageMenu->Append( m_calc_histogram );
+	
 	mImageFrameMenuBar->Append( mImageMenu, wxT("Image") ); 
 	
 	mToolsMenu = new wxMenu();
@@ -63,17 +71,25 @@ ImageFrame::ImageFrame( wxWindow* parent, wxWindowID id, const wxString& title, 
 	this->Centre( wxBOTH );
 	
 	// Connect Events
-	this->Connect( wxEVT_ERASE_BACKGROUND, wxEraseEventHandler( ImageFrame::on_erase_background ) );
+	this->Connect( wxEVT_PAINT, wxPaintEventHandler( ImageFrame::on_paint ) );
+	this->Connect( wxEVT_SIZE, wxSizeEventHandler( ImageFrame::on_size ) );
+	m_ocv_canvas->Connect( wxEVT_LEAVE_WINDOW, wxMouseEventHandler( ImageFrame::on_leave_window ), NULL, this );
 	this->Connect( mMenuItemOpen->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( ImageFrame::on_menu_open ) );
 	this->Connect( mMenuItemExit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( ImageFrame::on_menu_exit ) );
+	this->Connect( m_calc_MTF->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( ImageFrame::on_calc_mtf ) );
+	this->Connect( m_calc_histogram->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( ImageFrame::on_calc_histogram ) );
 }
 
 ImageFrame::~ImageFrame()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_ERASE_BACKGROUND, wxEraseEventHandler( ImageFrame::on_erase_background ) );
+	this->Disconnect( wxEVT_PAINT, wxPaintEventHandler( ImageFrame::on_paint ) );
+	this->Disconnect( wxEVT_SIZE, wxSizeEventHandler( ImageFrame::on_size ) );
+	m_ocv_canvas->Disconnect( wxEVT_LEAVE_WINDOW, wxMouseEventHandler( ImageFrame::on_leave_window ), NULL, this );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( ImageFrame::on_menu_open ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( ImageFrame::on_menu_exit ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( ImageFrame::on_calc_mtf ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( ImageFrame::on_calc_histogram ) );
 	
 }
 
@@ -187,6 +203,9 @@ OverviewImgSubPanel::OverviewImgSubPanel( wxWindow* parent, wxWindowID id, const
 	// Connect Events
 	this->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( OverviewImgSubPanel::on_left_dbl_clk ) );
 	this->Connect( wxEVT_PAINT, wxPaintEventHandler( OverviewImgSubPanel::on_paint ) );
+	m_img_canvas_left->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( OverviewImgSubPanel::on_left_img_thunmnail_double_click ), NULL, this );
+	m_img_canvas_mid->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( OverviewImgSubPanel::on_mid_img_thunmnail_double_click ), NULL, this );
+	m_img_canvas_right->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( OverviewImgSubPanel::on_right_img_thunmnail_double_click ), NULL, this );
 }
 
 OverviewImgSubPanel::~OverviewImgSubPanel()
@@ -194,6 +213,9 @@ OverviewImgSubPanel::~OverviewImgSubPanel()
 	// Disconnect Events
 	this->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( OverviewImgSubPanel::on_left_dbl_clk ) );
 	this->Disconnect( wxEVT_PAINT, wxPaintEventHandler( OverviewImgSubPanel::on_paint ) );
+	m_img_canvas_left->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( OverviewImgSubPanel::on_left_img_thunmnail_double_click ), NULL, this );
+	m_img_canvas_mid->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( OverviewImgSubPanel::on_mid_img_thunmnail_double_click ), NULL, this );
+	m_img_canvas_right->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( OverviewImgSubPanel::on_right_img_thunmnail_double_click ), NULL, this );
 	
 }
 
@@ -202,13 +224,13 @@ OverviewGraphSubPanel ::OverviewGraphSubPanel ( wxWindow* parent, wxWindowID id,
 	wxStaticBoxSizer* graphSubPanelBoxSizer;
 	graphSubPanelBoxSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("graphs") ), wxHORIZONTAL );
 	
-	m_graph_wnd_left = new mpWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER|wxTAB_TRAVERSAL );
+	m_graph_wnd_left = new c_graph_canvas( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER|wxTAB_TRAVERSAL );
 	graphSubPanelBoxSizer->Add( m_graph_wnd_left, 1, wxEXPAND | wxALL, 5 );
 	
-	m_graph_wnd_mid = new mpWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER|wxTAB_TRAVERSAL );
+	m_graph_wnd_mid = new c_graph_canvas( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER|wxTAB_TRAVERSAL );
 	graphSubPanelBoxSizer->Add( m_graph_wnd_mid, 1, wxEXPAND | wxALL, 5 );
 	
-	m_graph_wnd_right = new mpWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER|wxTAB_TRAVERSAL );
+	m_graph_wnd_right = new c_graph_canvas( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER|wxTAB_TRAVERSAL );
 	graphSubPanelBoxSizer->Add( m_graph_wnd_right, 1, wxEXPAND | wxALL, 5 );
 	
 	

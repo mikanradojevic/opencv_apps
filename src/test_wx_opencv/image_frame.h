@@ -4,11 +4,14 @@
 #include <string>
 #include <sstream>
 #include "gui_classes.h"
+#include "prerequisites.h"
+#include "image.h"
 
+class c_overview_frame; 
 class c_image_frame : public ImageFrame
 {
-public: 
-	
+	typedef ImageFrame super; 
+public: 	
 	c_image_frame(wxWindow *parent, 
 				wxWindowID id = wxID_ANY, 
 				const wxString& title = wxEmptyString, 
@@ -18,15 +21,26 @@ public:
 	
 	~c_image_frame() {} 
 	
-	/// Menu Commands Handlers
-	virtual void on_menu_open( wxCommandEvent& event );
-	virtual void on_menu_exit( wxCommandEvent& event );
-	virtual void on_erase_background( wxEraseEvent& event ) {}
+	void set_image(ocv_mat_ptr image, const std::string& name, e_image_idx img_idx);
+	
+	////////////////////////////////////////////////////////////////////////// 
+	
+protected:
+	
+	void resize_window_image(int width, int height); 
+	virtual void on_leave_window( wxMouseEvent& event ); 
+	virtual void on_size( wxSizeEvent& event );
+	virtual void on_paint( wxPaintEvent& event ); 
 
-	void open_image(const wxString& img_file);
+	virtual void on_calc_histogram( wxCommandEvent& event );
+	virtual void on_calc_mtf( wxCommandEvent& event ); 
 	
 private: 
-	
+	ocv_mat_ptr m_img;
+	e_image_idx m_img_idx; 
+	bool m_is_rgb; 
+
+	c_overview_frame *m_overview_frame; 
 };
 
 #endif 

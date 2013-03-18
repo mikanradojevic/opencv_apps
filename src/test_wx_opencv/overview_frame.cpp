@@ -7,13 +7,15 @@
 #include "ocv_canvas.h"
 #include "ocv_cam_canvas.h"
 #include "video_capture.h"
+#include "graph_canvas.h"
+#include "image_frame.h"
 
 static const wxString APP_NAME = wxT("LensCorrectionApp"); 
 static const wxString UI_CONFIG_PATH = wxT("/ui_config");
 static const wxString FRAME_WIDTH_CONFIG_KEY = UI_CONFIG_PATH + wxT("/frame_width");
 static const wxString FRAME_HEIGHT_CONFIG_KEY = UI_CONFIG_PATH + wxT("/frame_height"); 
 static const wxString FRAME_POS_X_CONFIG_KEY = UI_CONFIG_PATH + wxT("/frame_posx");
-static const wxString FRAME_POS_Y_CONFIG_KEY = UI_CONFIG_PATH + wxT("/frame_posy"); 
+static const wxString FRAME_POS_Y_CONFIG_KEY = UI_CONFIG_PATH + wxT("/frame_posy");
 
 c_overview_cam_panel::c_overview_cam_panel(wxWindow *parent, 
 										wxWindowID id /* = wxID_ANY */, 
@@ -28,17 +30,48 @@ c_overview_cam_panel::c_overview_cam_panel(wxWindow *parent,
 	m_cam_canvas_left->active_render_loop(true); 
 	m_cam_canvas_mid->set_videocap_idx(k_mid_image); 
 	m_cam_canvas_right->set_videocap_idx(k_right_image);
+
+	m_overview_frame = static_cast<c_overview_frame*>(parent);
 }
 
-void c_overview_cam_panel::on_capture_click_left( wxCommandEvent& event )
+void c_overview_cam_panel::on_capture_left_click( wxCommandEvent& event )
 {
 	ocv_mat_ptr img = m_cam_canvas_left->get_current_frame();
-	
-	
+	if (is_image_valid(img))
+	{
+		if (m_overview_frame)
+		{
+			get_ocv_img_mgr()->add_image(LEFT_IMAGE_ORIGINAL_NAME, img); 
+			
+			// Convert RGB to Grayscale
+			ocv_mat_ptr grayscale_img = ocv_mat_ptr(new cv::Mat(img->cols, img->rows, CV_8UC1)); 
+			cvtColor(*img, *grayscale_img,  CV_RGB2GRAY); 
+
+			get_ocv_img_mgr()->add_image(LEFT_IMAGE_GRAYSCALE_NAME, grayscale_img);
+
+			// Show the image on the image panel 
+			c_overview_img_panel *img_panel = m_overview_frame->get_overview_img_panel(); 
+			std::string name = "left_image"; 
+			img_panel->get_ocv_canvas(k_left_image)->set_image(img, name); 
+
+			// Calculate the histogram
+			c_overview_graph_panel *hist_panel = m_overview_frame->get_overview_graph_panel_hist();
+			hist_panel->calculate_histogram(grayscale_img, k_left_image); 
+			
+			/* 
+			c_overview_graph_panel *mtf_panel = m_overview_frame->get_overview_graph_panel_mtf();
+			mtf_panel->calculate_mtf(grayscale_img, k_left_image); 
+			*/ 
+		}
+		else 
+			assert(false); 
+	}
+	else 
+		assert(false);
 }
 
 void c_overview_cam_panel::on_capture_click_mid( wxCommandEvent& event ) 
-{
+{ 
 	
 	
 }
@@ -58,15 +91,50 @@ c_overview_img_panel::c_overview_img_panel(wxWindow *parent,
 										long style)
 										: OverviewImgSubPanel(parent, id, pos, size, style)
 { 
-	m_img_canvas_left->set_img_idx(k_left_image); 
-	m_img_canvas_left->set_thumbnail_flag(true);
-
-	m_img_canvas_mid->set_img_idx(k_mid_image);
-	m_img_canvas_mid->set_thumbnail_flag(true);
-	
-	m_img_canvas_right->set_img_idx(k_right_image);
-	m_img_canvas_right->set_thumbnail_flag(true); 
+	m_overview_frame = static_cast<c_overview_frame*>(parent); 
+	assert(m_overview_frame);  	
 } 
+
+
+c_ocv_canvas* c_overview_img_panel::get_ocv_canvas(e_image_idx img_idx) 
+{
+	c_ocv_canvas *ret = NULL;
+	switch (img_idx)
+	{
+	case k_left_image:
+		ret = m_img_canvas_left;
+		break;
+	case k_mid_image:
+		ret = m_img_canvas_mid;
+		break; 
+	case k_right_image: 
+		ret = m_img_canvas_right;
+		break; 
+	} 
+	assert(ret != NULL);
+	return ret;
+}
+
+void c_overview_img_panel::on_left_img_thunmnail_double_click(wxMouseEvent& event)
+{
+	ocv_mat_ptr left_grayscale_img = get_ocv_img_mgr()->find_image_by_name(LEFT_IMAGE_GRAYSCALE_NAME); 
+	if (left_grayscale_img)
+	{ 
+		c_image_frame *img_frame = new c_image_frame(m_overview_frame, wxID_IMAGE_FRAME);
+		img_frame->set_image(left_grayscale_img, LEFT_IMAGE_GRAYSCALE_NAME, k_left_image);
+		img_frame->Show(); 
+	}
+}
+
+void c_overview_img_panel::on_mid_img_thunmnail_double_click( wxMouseEvent& event )
+{
+	
+}
+
+void c_overview_img_panel::on_right_img_thunmnail_double_click( wxMouseEvent& event )
+{ 
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -90,18 +158,20 @@ c_overview_graph_panel::c_overview_graph_panel(wxWindow *parent,
 
 void c_overview_graph_panel::update_graph()
 {
+	/*
 	switch(m_graph_type)
 	{
 	case k_graph_histogram:
-		add_histograms(k_left_image); 
-		add_histograms(k_mid_image); 
-		add_histograms(k_right_image); 
+		add_histogram(k_left_image); 
+		add_histogram(k_mid_image); 
+		add_histogram(k_right_image); 
 		break;
 
 	case k_graph_mtf:
 		
 		break;
-	}
+	} 
+	*/
 }
 
 void c_overview_graph_panel::set_label_text(const wxString& label)
@@ -111,91 +181,53 @@ void c_overview_graph_panel::set_label_text(const wxString& label)
 	static_box->SetLabel(label); 
 }
 
-void c_overview_graph_panel::add_histograms(e_image_idx img_idx)
-{	
-	ocv_mat_ptr img = get_ocv_img_mgr()->get_grayscale_img(img_idx); 
+void c_overview_graph_panel::calculate_histogram(ocv_mat_ptr img, e_image_idx img_idx)
+{
 	if (!is_ptr_null(img))
 	{
-		ocv_mat_ptr hist_mat = get_ocv_img_mgr()->calc_grayscale_hist(img_idx); 
-		
 		/// Prepare the histogram data
 		hist_data_vec hist_data;
+		ocv_mat_ptr hist_mat = calc_hist(img);
 		hist_mat_to_vector(hist_mat, hist_data);
 		
 		switch (img_idx)
 		{
 		case k_left_image:
-			setup_hist_graph(m_graph_wnd_left, hist_data);
+			m_graph_wnd_left->setup_hist_graph(hist_data);
 			break;
 		case k_mid_image:
-			setup_hist_graph(m_graph_wnd_mid, hist_data); 
+			m_graph_wnd_mid->setup_hist_graph(hist_data);
 			break; 
 		case k_right_image: 
-			setup_hist_graph(m_graph_wnd_right, hist_data);
+			m_graph_wnd_right->setup_hist_graph(hist_data);
 			break; 
 		} 
 	} 
-}
+} 
 
-void c_overview_graph_panel::add_mtf(e_image_idx img_idx)
+void c_overview_graph_panel::calculate_mtf(ocv_mat_ptr img, e_image_idx img_idx, wxPoint& start, wxPoint& end)
 {
-	
-	
-}
+	if (!is_ptr_null(img))
+	{
+		mtf_data_vec mtf_data;
+		cv::Point p1(start.x, start.y);
+		cv::Point p2(end.x, end.y); 
+		calc_mtf(img, p1, p2, mtf_data);
 
-void c_overview_graph_panel::setup_hist_graph(mpWindow *mp_wnd, hist_data_vec& hist_data)
-{
-	c_histogram_layar *hist_layer = new c_histogram_layar(hist_data);
-	double min_x = hist_layer->GetMinX(); 
-	double max_x = hist_layer->GetMaxX(); 
-	double min_y = hist_layer->GetMinY(); 
-	double max_y = hist_layer->GetMaxY(); 
-
-	/// Setup the graph
-	wxFont graph_font(9, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-	mpScaleX *axis_x = new mpScaleX(wxT("X"), mpALIGN_BOTTOM, true, mpX_NORMAL);
-	mpScaleY *axis_y = new mpScaleY(wxT("Y"), mpALIGN_LEFT, true); 
-	axis_x->SetFont(graph_font);
-	axis_y->SetFont(graph_font);
-	axis_x->SetDrawOutsideMargins(false); 
-	axis_y->SetDrawOutsideMargins(false);
-
-	mp_wnd->SetMargins(30, 10, 30, 60);
-	mp_wnd->AddLayer(axis_x);
-	mp_wnd->AddLayer(axis_y); 
-	mp_wnd->AddLayer(hist_layer);
-
-	mp_wnd->EnableDoubleBuffer(true);
-	mp_wnd->Fit(min_x, max_x, min_y, max_y);
-	mp_wnd->UpdateAll(); 
-}
-
-void c_overview_graph_panel::setup_mtf_graph(mpWindow *mp_wnd, mtf_data_vec& mtf_data)
-{
-	c_mtf_layer *mtf_layer = new c_mtf_layer(mtf_data);
-	double min_x = mtf_layer->GetMinX(); 
-	double max_x = mtf_layer->GetMaxX(); 
-	double min_y = mtf_layer->GetMinY(); 
-	double max_y = mtf_layer->GetMaxY(); 
-	
-	/// Setup the graph
-	wxFont graph_font(9, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-	mpScaleX *axis_x = new mpScaleX(wxT("X"), mpALIGN_BOTTOM, true, mpX_NORMAL);
-	mpScaleY *axis_y = new mpScaleY(wxT("Y"), mpALIGN_LEFT, true); 
-	axis_x->SetFont(graph_font);
-	axis_y->SetFont(graph_font);
-	axis_x->SetDrawOutsideMargins(false); 
-	axis_y->SetDrawOutsideMargins(false);
-
-	mp_wnd->SetMargins(30, 10, 30, 60);
-	mp_wnd->AddLayer(axis_x);
-	mp_wnd->AddLayer(axis_y); 
-	mp_wnd->AddLayer(mtf_layer); 
-
-	mp_wnd->EnableDoubleBuffer(true);
-	mp_wnd->Fit(min_x, max_x, min_y, max_y); 
-	mp_wnd->UpdateAll(); 
-}
+		switch (img_idx)
+		{
+		case k_left_image:
+			m_graph_wnd_left->setup_mtf_graph(mtf_data);
+			break;
+		case k_mid_image:
+			m_graph_wnd_mid->setup_mtf_graph(mtf_data);
+			break; 
+		case k_right_image: 
+			m_graph_wnd_right->setup_mtf_graph(mtf_data);
+			break; 
+		}  
+	}
+} 
 
 void c_overview_graph_panel::on_img_loaded(wxEvent& event)
 {
@@ -229,12 +261,16 @@ c_overview_frame::c_overview_frame(wxWindow *parent,
 
 	add_cam_sub_panel(wxT("Camera"));
 	add_image_sub_panel(wxT("Images")); 
-	add_graph_sub_panel(wxT("Histograms"), k_graph_histogram);
+	add_graph_sub_panel(wxT("Histograms"), k_graph_histogram); 
+	add_graph_sub_panel(wxT("MTF"), k_graph_mtf); 
 
 	restore_config();
+
+	Refresh();
+	Update();
 }
 
-c_overview_frame::~c_overview_frame()
+c_overview_frame::~c_overview_frame() 
 {
 	write_config(); 
 }
@@ -248,17 +284,32 @@ void c_overview_frame::add_image_sub_panel(const wxString& caption)
 	sizer_flags.Expand().Border(20);
 	box_sizer->Add(img_panel, sizer_flags); 
 	box_sizer->Layout(); 
+
+	img_panel->Refresh(); 
+	img_panel->Update(); 
 }
 
 void c_overview_frame::add_graph_sub_panel(const wxString& caption, e_graph_type graph_type)
 {
-	c_overview_graph_panel *graph_panel = new c_overview_graph_panel(this, graph_type, caption, wxID_OVERVIEW_GRAPH_PANEL);
+	c_overview_graph_panel *graph_panel = NULL; 
+	switch (graph_type) 
+	{
+	case k_graph_histogram:
+		graph_panel = new c_overview_graph_panel(this, graph_type, caption, wxID_OVERVIEW_GRAPH_PANEL_HIST); 
+		break; 
+	case k_graph_mtf: 
+		graph_panel = new c_overview_graph_panel(this, graph_type, caption, wxID_OVERVIEW_GRAPH_PANEL_MTF);
+		break;
+	} 
 	
 	wxBoxSizer *box_sizer = static_cast<wxBoxSizer*>(GetSizer());
 	wxSizerFlags sizer_flags(1); 
 	sizer_flags.Expand().Border(20);
 	box_sizer->Add(graph_panel, sizer_flags); 
 	box_sizer->Layout(); 
+
+	graph_panel->Refresh();
+	graph_panel->Update();
 }
 
 void c_overview_frame::add_cam_sub_panel(const wxString& caption)
@@ -270,6 +321,9 @@ void c_overview_frame::add_cam_sub_panel(const wxString& caption)
 	sizer_flags.Expand().Border(20);
 	box_sizer->Add(cam_panel, sizer_flags); 
 	box_sizer->Layout();
+
+	cam_panel->Refresh();
+	cam_panel->Update(); 
 }
 
 void c_overview_frame::init_config()
@@ -293,8 +347,7 @@ void c_overview_frame::restore_config()
 	double frame_posy = 0;
 	wxFileConfig::Get()->Read(FRAME_POS_X_CONFIG_KEY, &frame_posx);
 	wxFileConfig::Get()->Read(FRAME_POS_Y_CONFIG_KEY, &frame_posy);
-	SetPosition(wxPoint(frame_posx, frame_posy));
-
+	SetPosition(wxPoint(frame_posx, frame_posy)); 
 }
 
 void c_overview_frame::write_config()
@@ -308,4 +361,28 @@ void c_overview_frame::write_config()
 	wxPoint frame_pos = GetPosition();
 	wxFileConfig::Get()->Write(FRAME_POS_X_CONFIG_KEY, frame_pos.x);
 	wxFileConfig::Get()->Write(FRAME_POS_Y_CONFIG_KEY, frame_pos.y);
+}
+
+c_overview_cam_panel* c_overview_frame::get_overview_cam_panel()
+{
+	c_overview_cam_panel *cam_panel = static_cast<c_overview_cam_panel*>(this->FindWindowById(wxID_OVERVIEW_CAM_FRAME));
+	return cam_panel; 
+}
+
+c_overview_img_panel* c_overview_frame::get_overview_img_panel()
+{
+	c_overview_img_panel *img_panel = static_cast<c_overview_img_panel*>(this->FindWindowById(wxID_OVERVIEW_IMG_PANEL)); 
+	return img_panel; 
+}
+
+c_overview_graph_panel* c_overview_frame::get_overview_graph_panel_hist()
+{
+	c_overview_graph_panel *graph_panel = static_cast<c_overview_graph_panel*>(this->FindWindowById(wxID_OVERVIEW_GRAPH_PANEL_HIST));
+	return graph_panel; 
+}
+
+c_overview_graph_panel* c_overview_frame::get_overview_graph_panel_mtf()
+{
+	c_overview_graph_panel *graph_panel = static_cast<c_overview_graph_panel*>(this->FindWindowById(wxID_OVERVIEW_GRAPH_PANEL_MTF));
+	return graph_panel; 
 }
