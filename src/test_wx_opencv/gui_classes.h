@@ -34,9 +34,12 @@ class c_ocv_canvas;
 
 ///////////////////////////////////////////////////////////////////////////
 
-#define wxID_BTN_CAPTURE_LEFT 1000
-#define wxID_BTN_CAPTURE_MID 1001
-#define wxID_BTN_CAPTURE_RIGHT 1002
+#define wxID_CAM_CANVAS_LEFT 1000
+#define wxID_BTN_CAPTURE_LEFT 1001
+#define wxID_CAM_CANVAS_MID 1002
+#define wxID_BTN_CAPTURE_MID 1003
+#define wxID_CAM_CANVAS_RIGHT 1004
+#define wxID_BTN_CAPTURE_RIGHT 1005
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class ImageFrame
@@ -174,16 +177,22 @@ class OverviewVideoSubPanel : public wxPanel
 	
 	protected:
 		c_ocv_cam_canvas* m_cam_canvas_left;
+		wxButton* m_btn_open_cam_left;
 		wxButton* m_btn_capture_left;
-		c_ocv_cam_canvas* m_cam_canvas_right;
-		wxButton* m_btn_capture_mid;
 		c_ocv_cam_canvas* m_cam_canvas_mid;
+		wxButton* m_btn_open_cam_mid;
+		wxButton* m_btn_capture_mid;
+		c_ocv_cam_canvas* m_cam_canvas_right;
+		wxButton* m_btn_open_cam_right;
 		wxButton* m_btn_capture_right;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void on_open_cam_left_click( wxCommandEvent& event ) { event.Skip(); }
 		virtual void on_capture_left_click( wxCommandEvent& event ) { event.Skip(); }
-		virtual void on_capture_click_mid( wxCommandEvent& event ) { event.Skip(); }
-		virtual void on_capture_click_right( wxCommandEvent& event ) { event.Skip(); }
+		virtual void on_open_cam_mid_click( wxCommandEvent& event ) { event.Skip(); }
+		virtual void on_capture_mid_click( wxCommandEvent& event ) { event.Skip(); }
+		virtual void on_open_cam_right_click( wxCommandEvent& event ) { event.Skip(); }
+		virtual void on_capture_right_click( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:

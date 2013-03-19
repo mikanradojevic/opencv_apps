@@ -13,7 +13,7 @@ public:
 	~c_videocap_manager(); 
 	
 	bool open_cam(e_image_idx idx); 
-	ocv_videocap_ptr get_ocv_videocap(e_image_idx idx) { return m_ocv_videocaps[idx]; }
+	ocv_videocap_ptr get_ocv_videocap(e_image_idx idx); 
 
 private: 
 	std::vector<ocv_videocap_ptr> m_ocv_videocaps; 

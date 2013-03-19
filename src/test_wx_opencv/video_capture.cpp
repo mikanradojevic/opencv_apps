@@ -27,6 +27,12 @@ bool c_videocap_manager::open_cam(e_image_idx cam_idx)
 	return is_opened; 
 }
 
+ocv_videocap_ptr c_videocap_manager::get_ocv_videocap(e_image_idx idx)
+{
+	int i = (int)idx;
+	return m_ocv_videocaps[i];
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 c_videocap_manager* get_videocap_mgr() 

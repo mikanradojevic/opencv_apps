@@ -86,7 +86,7 @@ public:
 
 	virtual double GetMaxY()
 	{
-		return m_max_y; 
+		return 1.0; 
 	}
 
 	virtual double GetY( double x )

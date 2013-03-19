@@ -4,9 +4,9 @@
 #include "ocv_canvas.h"
 
 class c_render_timer; 
-class c_ocv_cam_canvas : public c_ocv_canvas
+class c_ocv_cam_canvas : public wxScrolledWindow
 {
-	typedef c_ocv_canvas super; 
+	typedef wxScrolledWindow super; 
 	
 public:
 	c_ocv_cam_canvas(wxWindow *parent, 

@@ -23,19 +23,16 @@ c_overview_cam_panel::c_overview_cam_panel(wxWindow *parent,
 										const wxSize& size /* = wxDefaultSize */, 
 										long style /* = wxTAB_TRAVERSAL */)
 										: OverviewVideoSubPanel(parent, id, pos, size, style)
-{
-	get_videocap_mgr()->get_ocv_videocap(k_left_image)->open(0);
-	
-	m_cam_canvas_left->set_videocap_idx(k_left_image); 
-	m_cam_canvas_left->active_render_loop(true); 
-	m_cam_canvas_mid->set_videocap_idx(k_mid_image); 
-	m_cam_canvas_right->set_videocap_idx(k_right_image);
-
+{ 
 	m_overview_frame = static_cast<c_overview_frame*>(parent);
+
+	m_cam_canvas_left->set_videocap_idx(k_left_image); 
+	m_cam_canvas_mid->set_videocap_idx(k_mid_image); 
+	m_cam_canvas_right->set_videocap_idx(k_right_image); 
 }
 
 void c_overview_cam_panel::on_capture_left_click( wxCommandEvent& event )
-{
+{	
 	ocv_mat_ptr img = m_cam_canvas_left->get_current_frame();
 	if (is_image_valid(img))
 	{
@@ -57,11 +54,41 @@ void c_overview_cam_panel::on_capture_left_click( wxCommandEvent& event )
 			// Calculate the histogram
 			c_overview_graph_panel *hist_panel = m_overview_frame->get_overview_graph_panel_hist();
 			hist_panel->calculate_histogram(grayscale_img, k_left_image); 
+			hist_panel->UpdateWindowUI(wxUPDATE_UI_RECURSE);
+		}
+		else 
+			assert(false); 
+	}
+	else 
+		assert(false);
+	
+}
+
+void c_overview_cam_panel::on_capture_mid_click( wxCommandEvent& event ) 
+{ 
+	ocv_mat_ptr img = m_cam_canvas_mid->get_current_frame();
+	if (is_image_valid(img))
+	{
+		if (m_overview_frame)
+		{
+			get_ocv_img_mgr()->add_image(MID_IMAGE_ORIGINAL_NAME, img); 
+
+			// Convert RGB to Grayscale
+			ocv_mat_ptr grayscale_img = ocv_mat_ptr(new cv::Mat(img->cols, img->rows, CV_8UC1)); 
+			cvtColor(*img, *grayscale_img,  CV_RGB2GRAY); 
+
+			get_ocv_img_mgr()->add_image(MID_IMAGE_GRAYSCALE_NAME, grayscale_img);
+
+			// Show the image on the image panel 
+			c_overview_img_panel *img_panel = m_overview_frame->get_overview_img_panel(); 
+			std::string name = "mid_image"; 
+			img_panel->get_ocv_canvas(k_mid_image)->set_image(img, name); 
+
+			// Calculate the histogram
+			c_overview_graph_panel *hist_panel = m_overview_frame->get_overview_graph_panel_hist();
+			hist_panel->calculate_histogram(grayscale_img, k_mid_image); 
+			hist_panel->UpdateWindowUI(wxUPDATE_UI_RECURSE);
 			
-			/* 
-			c_overview_graph_panel *mtf_panel = m_overview_frame->get_overview_graph_panel_mtf();
-			mtf_panel->calculate_mtf(grayscale_img, k_left_image); 
-			*/ 
 		}
 		else 
 			assert(false); 
@@ -70,17 +97,90 @@ void c_overview_cam_panel::on_capture_left_click( wxCommandEvent& event )
 		assert(false);
 }
 
-void c_overview_cam_panel::on_capture_click_mid( wxCommandEvent& event ) 
+void c_overview_cam_panel::on_capture_right_click( wxCommandEvent& event )
 { 
 	
+	ocv_mat_ptr img = m_cam_canvas_right->get_current_frame();
+	e_image_idx img_idx = k_right_image; 
+	if (is_image_valid(img))
+	{
+		if (m_overview_frame)
+		{
+			get_ocv_img_mgr()->add_image(RIGHT_IMAGE_ORIGINAL_NAME, img); 
+
+			// Convert RGB to Grayscale
+			ocv_mat_ptr grayscale_img = ocv_mat_ptr(new cv::Mat(img->cols, img->rows, CV_8UC1)); 
+			cvtColor(*img, *grayscale_img,  CV_RGB2GRAY); 
+
+			get_ocv_img_mgr()->add_image(RIGHT_IMAGE_GRAYSCALE_NAME, grayscale_img);
+
+			// Show the image on the image panel 
+			c_overview_img_panel *img_panel = m_overview_frame->get_overview_img_panel(); 
+			std::string name = "right_image"; 
+			img_panel->get_ocv_canvas(k_right_image)->set_image(img, name); 
+
+			// Calculate the histogram
+			c_overview_graph_panel *hist_panel = m_overview_frame->get_overview_graph_panel_hist();
+			hist_panel->calculate_histogram(grayscale_img, k_right_image); 
+			hist_panel->UpdateWindowUI(wxUPDATE_UI_RECURSE);
+		}
+		else 
+			assert(false); 
+	}
+	else 
+		assert(false);
+
+}
+
+void c_overview_cam_panel::on_open_cam_left_click( wxCommandEvent& event )
+{
+	
+	close_all_cams();
+	get_videocap_mgr()->get_ocv_videocap(k_left_image)->open(0); 
+	m_cam_canvas_left->set_videocap_idx(k_left_image); 
+	m_cam_canvas_left->active_render_loop(true); 
 	
 }
 
-void c_overview_cam_panel::on_capture_click_right( wxCommandEvent& event )
-{ 
-	
+void c_overview_cam_panel::on_open_cam_mid_click( wxCommandEvent& event )
+{
+	close_all_cams(); 
+	get_videocap_mgr()->get_ocv_videocap(k_mid_image)->open(1); 
+	m_cam_canvas_mid->set_videocap_idx(k_mid_image); 
+	m_cam_canvas_mid->active_render_loop(true);
 }
 
+void c_overview_cam_panel::on_open_cam_right_click( wxCommandEvent& event )
+{
+	
+	close_all_cams(); 
+	get_videocap_mgr()->get_ocv_videocap(k_right_image)->open(2); 
+	m_cam_canvas_right->set_videocap_idx(k_right_image); 
+	m_cam_canvas_right->active_render_loop(true); 
+}
+
+void c_overview_cam_panel::close_all_cams()
+{
+	
+	if (get_videocap_mgr()->get_ocv_videocap(k_left_image)->isOpened())
+	{
+		get_videocap_mgr()->get_ocv_videocap(k_left_image)->release(); 
+		m_cam_canvas_left->active_render_loop(false); 
+	}
+	 
+	if (get_videocap_mgr()->get_ocv_videocap(k_mid_image)->isOpened())
+	{
+		get_videocap_mgr()->get_ocv_videocap(k_mid_image)->release(); 
+		m_cam_canvas_mid->active_render_loop(false); 
+	}
+	
+	if (get_videocap_mgr()->get_ocv_videocap(k_right_image)->isOpened())
+	{
+		get_videocap_mgr()->get_ocv_videocap(k_right_image)->release();
+		m_cam_canvas_right->active_render_loop(false); 
+	}
+	 
+}
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -92,7 +192,7 @@ c_overview_img_panel::c_overview_img_panel(wxWindow *parent,
 										: OverviewImgSubPanel(parent, id, pos, size, style)
 { 
 	m_overview_frame = static_cast<c_overview_frame*>(parent); 
-	assert(m_overview_frame);  	
+	assert(m_overview_frame);  
 } 
 
 
@@ -128,11 +228,24 @@ void c_overview_img_panel::on_left_img_thunmnail_double_click(wxMouseEvent& even
 
 void c_overview_img_panel::on_mid_img_thunmnail_double_click( wxMouseEvent& event )
 {
-	
+	ocv_mat_ptr grayscale_img = get_ocv_img_mgr()->find_image_by_name(MID_IMAGE_GRAYSCALE_NAME); 
+	if (grayscale_img)
+	{ 
+		c_image_frame *img_frame = new c_image_frame(m_overview_frame, wxID_IMAGE_FRAME);
+		img_frame->set_image(grayscale_img, MID_IMAGE_GRAYSCALE_NAME, k_mid_image);
+		img_frame->Show(); 
+	}
 }
 
 void c_overview_img_panel::on_right_img_thunmnail_double_click( wxMouseEvent& event )
 { 
+	ocv_mat_ptr grayscale_img = get_ocv_img_mgr()->find_image_by_name(RIGHT_IMAGE_GRAYSCALE_NAME); 
+	if (grayscale_img)
+	{ 
+		c_image_frame *img_frame = new c_image_frame(m_overview_frame, wxID_IMAGE_FRAME);
+		img_frame->set_image(grayscale_img, RIGHT_IMAGE_GRAYSCALE_NAME, k_right_image);
+		img_frame->Show(); 
+	}
 }
 
 
@@ -194,12 +307,18 @@ void c_overview_graph_panel::calculate_histogram(ocv_mat_ptr img, e_image_idx im
 		{
 		case k_left_image:
 			m_graph_wnd_left->setup_hist_graph(hist_data);
+			m_graph_wnd_left->Refresh();
+			m_graph_wnd_left->Update(); 
 			break;
 		case k_mid_image:
 			m_graph_wnd_mid->setup_hist_graph(hist_data);
+			m_graph_wnd_mid->Refresh();
+			m_graph_wnd_mid->Update(); 
 			break; 
 		case k_right_image: 
 			m_graph_wnd_right->setup_hist_graph(hist_data);
+			m_graph_wnd_right->Refresh();
+			m_graph_wnd_right->Update(); 
 			break; 
 		} 
 	} 
@@ -323,7 +442,7 @@ void c_overview_frame::add_cam_sub_panel(const wxString& caption)
 	box_sizer->Layout();
 
 	cam_panel->Refresh();
-	cam_panel->Update(); 
+	cam_panel->UpdateWindowUI(wxUPDATE_UI_RECURSE); 
 }
 
 void c_overview_frame::init_config()

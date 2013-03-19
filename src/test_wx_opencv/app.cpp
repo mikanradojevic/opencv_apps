@@ -14,7 +14,7 @@ bool c_wx_app::OnInit()
 
  
 	// Create the main frame
-	c_overview_frame *overview_frame = new c_overview_frame(NULL, wxID_OVERVIEW_FRAME, _T("Hello World"), wxPoint(50, 50), wxSize(450,340));
+	c_overview_frame *overview_frame = new c_overview_frame(NULL, wxID_OVERVIEW_FRAME, _T("镜头校准程序（测试版）"), wxPoint(50, 50), wxSize(450,340));
 	overview_frame->Show(true);
 	
     return true; 

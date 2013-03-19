@@ -37,6 +37,7 @@ void c_ocv_canvas::set_image(ocv_mat_ptr image, const std::string& name)
 	m_name = name;
 	m_update = true;
 
+	Refresh(); 
 	Update(); 
 }
 
@@ -61,7 +62,6 @@ void c_ocv_canvas::on_paint(wxPaintEvent& event)
 
 	draw_line(dc); 
 } 
-
 
 
 void c_ocv_canvas::on_erase_background(wxEraseEvent& event)

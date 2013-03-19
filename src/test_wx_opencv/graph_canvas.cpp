@@ -12,6 +12,8 @@ c_graph_canvas::c_graph_canvas(wxWindow *parent,
 
 void c_graph_canvas::setup_hist_graph(hist_data_vec& hist_data)
 {
+	DelAllLayers(true, true); 
+		
 	c_histogram_layar *hist_layer = new c_histogram_layar(hist_data);
 	double min_x = hist_layer->GetMinX(); 
 	double max_x = hist_layer->GetMaxX(); 
@@ -30,7 +32,7 @@ void c_graph_canvas::setup_hist_graph(hist_data_vec& hist_data)
 	this->SetMargins(30, 10, 30, 60);
 	this->AddLayer(axis_x);
 	this->AddLayer(axis_y); 
-	this->AddLayer(hist_layer);
+	this->AddLayer(hist_layer); 
 
 	this->EnableDoubleBuffer(true);
 	this->Fit(min_x, max_x, min_y, max_y);
@@ -39,6 +41,8 @@ void c_graph_canvas::setup_hist_graph(hist_data_vec& hist_data)
 
 void c_graph_canvas::setup_mtf_graph(mtf_data_vec& mtf_data)
 {
+	DelAllLayers(true, true); 
+
 	c_mtf_layer *mtf_layer = new c_mtf_layer(mtf_data);
 	double min_x = mtf_layer->GetMinX(); 
 	double max_x = mtf_layer->GetMaxX(); 

@@ -257,9 +257,12 @@ OverviewVideoSubPanel::OverviewVideoSubPanel( wxWindow* parent, wxWindowID id, c
 	wxStaticBoxSizer* sbSizerCamLeft;
 	sbSizerCamLeft = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Left") ), wxVERTICAL );
 	
-	m_cam_canvas_left = new c_ocv_cam_canvas( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxSIMPLE_BORDER|wxVSCROLL );
+	m_cam_canvas_left = new c_ocv_cam_canvas( this, wxID_CAM_CANVAS_LEFT, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxSIMPLE_BORDER|wxVSCROLL );
 	m_cam_canvas_left->SetScrollRate( 5, 5 );
 	sbSizerCamLeft->Add( m_cam_canvas_left, 1, wxEXPAND | wxALL, 5 );
+	
+	m_btn_open_cam_left = new wxButton( this, wxID_ANY, wxT("Open Camera"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizerCamLeft->Add( m_btn_open_cam_left, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_btn_capture_left = new wxButton( this, wxID_BTN_CAPTURE_LEFT, wxT("Capture"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_btn_capture_left->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
@@ -272,9 +275,12 @@ OverviewVideoSubPanel::OverviewVideoSubPanel( wxWindow* parent, wxWindowID id, c
 	wxStaticBoxSizer* sbSizerCamMid;
 	sbSizerCamMid = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Mid") ), wxVERTICAL );
 	
-	m_cam_canvas_right = new c_ocv_cam_canvas( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxSIMPLE_BORDER|wxVSCROLL );
-	m_cam_canvas_right->SetScrollRate( 5, 5 );
-	sbSizerCamMid->Add( m_cam_canvas_right, 1, wxEXPAND | wxALL, 5 );
+	m_cam_canvas_mid = new c_ocv_cam_canvas( this, wxID_CAM_CANVAS_MID, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxSIMPLE_BORDER|wxVSCROLL );
+	m_cam_canvas_mid->SetScrollRate( 5, 5 );
+	sbSizerCamMid->Add( m_cam_canvas_mid, 1, wxEXPAND | wxALL, 5 );
+	
+	m_btn_open_cam_mid = new wxButton( this, wxID_ANY, wxT("Open Camera"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizerCamMid->Add( m_btn_open_cam_mid, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_btn_capture_mid = new wxButton( this, wxID_BTN_CAPTURE_MID, wxT("Capture"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_btn_capture_mid->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
@@ -287,9 +293,12 @@ OverviewVideoSubPanel::OverviewVideoSubPanel( wxWindow* parent, wxWindowID id, c
 	wxStaticBoxSizer* sbSizerCamRight;
 	sbSizerCamRight = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Right") ), wxVERTICAL );
 	
-	m_cam_canvas_mid = new c_ocv_cam_canvas( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxSIMPLE_BORDER|wxVSCROLL );
-	m_cam_canvas_mid->SetScrollRate( 5, 5 );
-	sbSizerCamRight->Add( m_cam_canvas_mid, 1, wxEXPAND | wxALL, 5 );
+	m_cam_canvas_right = new c_ocv_cam_canvas( this, wxID_CAM_CANVAS_RIGHT, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxSIMPLE_BORDER|wxVSCROLL );
+	m_cam_canvas_right->SetScrollRate( 5, 5 );
+	sbSizerCamRight->Add( m_cam_canvas_right, 1, wxEXPAND | wxALL, 5 );
+	
+	m_btn_open_cam_right = new wxButton( this, wxID_ANY, wxT("Open Camera"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizerCamRight->Add( m_btn_open_cam_right, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_btn_capture_right = new wxButton( this, wxID_BTN_CAPTURE_RIGHT, wxT("Capture"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_btn_capture_right->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
@@ -305,16 +314,22 @@ OverviewVideoSubPanel::OverviewVideoSubPanel( wxWindow* parent, wxWindowID id, c
 	videoSubPanelBoxSizer->Fit( this );
 	
 	// Connect Events
+	m_btn_open_cam_left->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OverviewVideoSubPanel::on_open_cam_left_click ), NULL, this );
 	m_btn_capture_left->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OverviewVideoSubPanel::on_capture_left_click ), NULL, this );
-	m_btn_capture_mid->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OverviewVideoSubPanel::on_capture_click_mid ), NULL, this );
-	m_btn_capture_right->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OverviewVideoSubPanel::on_capture_click_right ), NULL, this );
+	m_btn_open_cam_mid->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OverviewVideoSubPanel::on_open_cam_mid_click ), NULL, this );
+	m_btn_capture_mid->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OverviewVideoSubPanel::on_capture_mid_click ), NULL, this );
+	m_btn_open_cam_right->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OverviewVideoSubPanel::on_open_cam_right_click ), NULL, this );
+	m_btn_capture_right->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OverviewVideoSubPanel::on_capture_right_click ), NULL, this );
 }
 
 OverviewVideoSubPanel::~OverviewVideoSubPanel()
 {
 	// Disconnect Events
+	m_btn_open_cam_left->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OverviewVideoSubPanel::on_open_cam_left_click ), NULL, this );
 	m_btn_capture_left->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OverviewVideoSubPanel::on_capture_left_click ), NULL, this );
-	m_btn_capture_mid->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OverviewVideoSubPanel::on_capture_click_mid ), NULL, this );
-	m_btn_capture_right->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OverviewVideoSubPanel::on_capture_click_right ), NULL, this );
+	m_btn_open_cam_mid->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OverviewVideoSubPanel::on_open_cam_mid_click ), NULL, this );
+	m_btn_capture_mid->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OverviewVideoSubPanel::on_capture_mid_click ), NULL, this );
+	m_btn_open_cam_right->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OverviewVideoSubPanel::on_open_cam_right_click ), NULL, this );
+	m_btn_capture_right->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OverviewVideoSubPanel::on_capture_right_click ), NULL, this );
 	
 }

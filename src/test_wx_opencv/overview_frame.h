@@ -18,9 +18,16 @@ public:
 						const wxSize& size = wxDefaultSize, 
 						long style = wxTAB_TRAVERSAL); 	
 
+	virtual void on_open_cam_left_click( wxCommandEvent& event );
+	virtual void on_open_cam_mid_click( wxCommandEvent& event ); 
+	virtual void on_open_cam_right_click( wxCommandEvent& event ); 
+	
 	virtual void on_capture_left_click( wxCommandEvent& event ); 
-	virtual void on_capture_click_mid( wxCommandEvent& event );
-	virtual void on_capture_click_right( wxCommandEvent& event );
+	virtual void on_capture_mid_click( wxCommandEvent& event );
+	virtual void on_capture_right_click( wxCommandEvent& event );
+
+private:
+	void close_all_cams(); 
 
 private: 
 	c_overview_frame *m_overview_frame; 

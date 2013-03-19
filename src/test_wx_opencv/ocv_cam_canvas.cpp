@@ -15,7 +15,6 @@ class c_render_timer : public wxTimer
 public:
 	c_render_timer(c_ocv_cam_canvas *cam_canvas); 
 	void Notify();
-	void start();
 
 private:
 	c_ocv_cam_canvas *m_cam_canvas; 
@@ -29,11 +28,7 @@ c_render_timer::c_render_timer(c_ocv_cam_canvas *cam_canvas)
 void c_render_timer::Notify()
 {
 	m_cam_canvas->Refresh(); 
-}
-
-void c_render_timer::start()
-{
-	wxTimer::Start(1000);
+	m_cam_canvas->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////// 
@@ -61,13 +56,25 @@ c_ocv_cam_canvas::~c_ocv_cam_canvas()
 }
 
 void c_ocv_cam_canvas::on_paint(wxPaintEvent& event)
-{
+{	
+	if (!m_render_loop_on)
+	{
+		event.Skip(); 
+		return; 
+	}
 	wxClientDC dc(this);
 	draw_captured(dc); 
 }
 
 void c_ocv_cam_canvas::draw_captured(wxDC& dc)
 {
+	if (m_videocap_idx == k_left_image)
+		wxLogMessage(wxT("draw_capture - left")); 
+	if (m_videocap_idx == k_mid_image)
+		wxLogMessage(wxT("draw_capture - mid")); 
+	if (m_videocap_idx == k_right_image)
+		wxLogMessage(wxT("draw_capture - right")); 
+
 	// Grab the next frame from camera
 	c_videocap_manager *videocap_mgr = get_videocap_mgr(); 
 	bool is_open = videocap_mgr->get_ocv_videocap(m_videocap_idx)->isOpened(); 
@@ -113,14 +120,17 @@ void c_ocv_cam_canvas::draw_now()
 
 void c_ocv_cam_canvas::active_render_loop(bool on) 
 {
-	if (on && !m_render_loop_on) 
-	{
-		m_render_loop_on = true;
-	}
-	else if (!on && m_render_loop_on) 
-	{
-		m_render_loop_on = false; 
-	}
+	m_render_loop_on = on; 
+	m_render_timer->Stop(); 
+
+	
+	if (on)
+		m_render_timer->Start(10000, true); 
+	else
+		m_render_timer->Stop();  
+	
+	Refresh(); 
+	Update(); 
 }
 
 ocv_mat_ptr c_ocv_cam_canvas::get_current_frame() 
