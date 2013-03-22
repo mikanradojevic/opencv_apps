@@ -31,6 +31,9 @@ class c_ocv_canvas;
 #include <wx/statbox.h>
 #include <wx/panel.h>
 #include <wx/button.h>
+#include <wx/stattext.h>
+#include <wx/textctrl.h>
+#include <wx/notebook.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -109,6 +112,10 @@ class OverviewFrame : public wxFrame
 		wxMenuBar* mOverviewFrameMenuBar;
 		wxMenu* mFileMenu;
 		wxMenu* mHelpMenu;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void on_save_report( wxCommandEvent& event ) { event.Skip(); }
+		
 	
 	public:
 		
@@ -199,6 +206,32 @@ class OverviewVideoSubPanel : public wxPanel
 		
 		OverviewVideoSubPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
 		~OverviewVideoSubPanel();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class ToolsFrame
+///////////////////////////////////////////////////////////////////////////////
+class ToolsFrame : public wxFrame 
+{
+	private:
+	
+	protected:
+		wxNotebook* m_notebook;
+		wxPanel* m_save_page;
+		wxStaticText* m_static_lens_name;
+		wxTextCtrl* m_txt_lens_name;
+		wxButton* m_btn_save;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void on_save_report( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		ToolsFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE );
+		
+		~ToolsFrame();
 	
 };
 

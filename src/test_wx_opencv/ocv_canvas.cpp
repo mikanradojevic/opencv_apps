@@ -100,7 +100,6 @@ void c_ocv_canvas::on_left_down( wxMouseEvent& event )
 
 	if (pt.x < client_rect.width && pt.y < client_rect.height) 
 	{
-		wxLogMessage(wxT("mouse down")); 
 		m_line_start = pt; 
 		m_using_line_tool = true; 
 		m_draw_line = false; 
@@ -114,7 +113,6 @@ void c_ocv_canvas::on_left_up( wxMouseEvent& event )
 
 	if (pt.x < client_rect.width && pt.y < client_rect.height) 
 	{
-		wxLogMessage(wxT("mouse up")); 
 		m_line_end = pt; 
 		m_using_line_tool = false; 
 		m_draw_line = true; 
@@ -129,7 +127,6 @@ void c_ocv_canvas::on_motion(wxMouseEvent& event)
 
 	if (pt.x < client_rect.width && pt.y < client_rect.height) 
 	{ 
-		wxLogMessage(wxT("mouse motion")); 
 		m_current_mouse_pt = pt; 
 		if (m_using_line_tool) 
 		{

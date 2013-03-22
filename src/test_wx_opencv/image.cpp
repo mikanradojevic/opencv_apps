@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <fstream>
+#include <sstream>
 #include "image.h"
 
 c_ocv_image_manager* get_ocv_img_mgr()
@@ -16,6 +17,45 @@ c_ocv_image_manager::~c_ocv_image_manager()
 {	
 }
 
+int c_ocv_image_manager::add_left_grayscale_image(ocv_mat_ptr img, int rotation_angle)
+{
+	std::stringstream ss; 
+	ss << rotation_angle; 
+	std::string name = LEFT_IMAGE_GRAYSCALE_NAME + "-" + ss.str(); 
+	int r = add_image(name, img); 
+	
+	if (r)
+		m_left_image_names.push_back(name);
+	
+	return r; 
+}
+
+int c_ocv_image_manager::add_mid_grayscale_image(ocv_mat_ptr img, int rotation_angle)
+{
+	std::stringstream ss; 
+	ss << rotation_angle; 
+	std::string name = MID_IMAGE_GRAYSCALE_NAME + "-" + ss.str(); 
+	int r = add_image(name, img); 
+
+	if (r)
+		m_mid_image_names.push_back(name);
+
+	return r; 
+}
+
+int c_ocv_image_manager::add_right_grayscale_image(ocv_mat_ptr img, int rotation_angle)
+{
+	std::stringstream ss; 
+	ss << rotation_angle; 
+	std::string name = RIGHT_IMAGE_GRAYSCALE_NAME + "-" + ss.str(); 
+	int r = add_image(name, img); 
+
+	if (r)
+		m_right_image_names.push_back(name);
+	
+	return r; 
+}
+
 int c_ocv_image_manager::add_image(const std::string& name, ocv_mat_ptr img) 
 {
 	 if (is_image_valid(img))
@@ -24,9 +64,12 @@ int c_ocv_image_manager::add_image(const std::string& name, ocv_mat_ptr img)
 		 if (!found_img)
 		 {
 			 m_image_dict.insert(images_map::value_type(name, img));
+			 return 1; 
 		 }
+		 else 
+			 return 0; 
 	 }
-	 return m_image_dict.size(); 
+	 return 0; 
 }
 
 int c_ocv_image_manager::remvove_image(const std::string& name, ocv_mat_ptr img) 

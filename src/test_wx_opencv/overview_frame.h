@@ -26,7 +26,6 @@ public:
 	virtual void on_capture_mid_click( wxCommandEvent& event );
 	virtual void on_capture_right_click( wxCommandEvent& event );
 
-private:
 	void close_all_cams(); 
 
 private: 
@@ -103,6 +102,9 @@ public:
 	c_overview_graph_panel* get_overview_graph_panel_hist();
 	c_overview_graph_panel* get_overview_graph_panel_mtf(); 
 	
+	virtual void on_save_report( wxCommandEvent& event ); 
+
+	
 private: 
 	void init_config(); 
 	void restore_config();
@@ -111,6 +113,8 @@ private:
 	void add_cam_sub_panel(const wxString& caption); 
 	void add_image_sub_panel(const wxString& caption);
 	void add_graph_sub_panel(const wxString& caption, e_graph_type graph_type); 
+
+	wxString generate_dir_name();
 
 	wxLogWindow *m_log_wnd; 
 };

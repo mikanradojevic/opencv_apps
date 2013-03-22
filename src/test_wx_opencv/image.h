@@ -27,6 +27,10 @@ public:
 	c_ocv_image_manager();
 	~c_ocv_image_manager();
  
+	int add_left_grayscale_image(ocv_mat_ptr img, int rotation_angle);
+	int add_mid_grayscale_image(ocv_mat_ptr img, int rotation_angle);
+	int add_right_grayscale_image(ocv_mat_ptr img, int rotation_angle); 
+	
 	// Add an image to the manager
 	int add_image(const std::string& name, ocv_mat_ptr img); 
 	// Remove an image 
@@ -34,10 +38,18 @@ public:
 	// Find an image
 	ocv_mat_ptr find_image_by_name(const std::string& name); 
 
+	std::vector<std::string> get_left_grayscale_img_names() const { return m_left_image_names; }
+	std::vector<std::string> get_mid_grayscale_img_names() const { return m_mid_image_names; }
+	std::vector<std::string> get_right_grayscale_img_names() const { return m_right_image_names; }
+
 private:  
 	
 	images_map m_image_dict; 
 	hist_map m_hist_dict; 
+	
+	std::vector<std::string> m_left_image_names; 
+	std::vector<std::string> m_mid_image_names;
+	std::vector<std::string> m_right_image_names; 
 
 };
 extern c_ocv_image_manager* get_ocv_img_mgr(); 

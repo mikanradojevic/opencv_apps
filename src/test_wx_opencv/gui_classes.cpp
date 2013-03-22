@@ -172,10 +172,16 @@ OverviewFrame::OverviewFrame( wxWindow* parent, wxWindowID id, const wxString& t
 	
 	
 	this->Centre( wxBOTH );
+	
+	// Connect Events
+	this->Connect( mSaveMenuItem->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( OverviewFrame::on_save_report ) );
 }
 
 OverviewFrame::~OverviewFrame()
 {
+	// Disconnect Events
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( OverviewFrame::on_save_report ) );
+	
 }
 
 OverviewImgSubPanel::OverviewImgSubPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
@@ -331,5 +337,54 @@ OverviewVideoSubPanel::~OverviewVideoSubPanel()
 	m_btn_capture_mid->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OverviewVideoSubPanel::on_capture_mid_click ), NULL, this );
 	m_btn_open_cam_right->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OverviewVideoSubPanel::on_open_cam_right_click ), NULL, this );
 	m_btn_capture_right->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OverviewVideoSubPanel::on_capture_right_click ), NULL, this );
+	
+}
+
+ToolsFrame::ToolsFrame( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizer4;
+	bSizer4 = new wxBoxSizer( wxVERTICAL );
+	
+	m_notebook = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0|wxTAB_TRAVERSAL );
+	m_save_page = new wxPanel( m_notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxFlexGridSizer* fgSizer1;
+	fgSizer1 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer1->SetFlexibleDirection( wxBOTH );
+	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_static_lens_name = new wxStaticText( m_save_page, wxID_ANY, wxT("Lens Name: "), wxDefaultPosition, wxDefaultSize, 0 );
+	m_static_lens_name->Wrap( -1 );
+	fgSizer1->Add( m_static_lens_name, 0, wxALL, 5 );
+	
+	m_txt_lens_name = new wxTextCtrl( m_save_page, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer1->Add( m_txt_lens_name, 0, wxALL, 5 );
+	
+	m_btn_save = new wxButton( m_save_page, wxID_ANY, wxT("Save Report"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer1->Add( m_btn_save, 0, wxALL, 5 );
+	
+	
+	m_save_page->SetSizer( fgSizer1 );
+	m_save_page->Layout();
+	fgSizer1->Fit( m_save_page );
+	m_notebook->AddPage( m_save_page, wxT("Save"), false );
+	
+	bSizer4->Add( m_notebook, 1, wxEXPAND | wxALL, 5 );
+	
+	
+	this->SetSizer( bSizer4 );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	m_btn_save->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ToolsFrame::on_save_report ), NULL, this );
+}
+
+ToolsFrame::~ToolsFrame()
+{
+	// Disconnect Events
+	m_btn_save->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ToolsFrame::on_save_report ), NULL, this );
 	
 }

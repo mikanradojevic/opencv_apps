@@ -9,9 +9,10 @@
 #define wxID_OVERVIEW_FRAME (HIGHESTID+103)
 #define wxID_OVERVIEW_CAM_FRAME (HIGHESTID+104) 
 #define wxID_IMAGE_FRAME (HIGHESTID+105)
+#define wxID_TOOLS_PANEL (HIGHESTID+106)
 
 #include <vector>
-#include "boost/shared_ptr.hpp"
+#include "boost/shared_ptr.hpp" 
 
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp" 

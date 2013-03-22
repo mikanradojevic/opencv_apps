@@ -68,13 +68,6 @@ void c_ocv_cam_canvas::on_paint(wxPaintEvent& event)
 
 void c_ocv_cam_canvas::draw_captured(wxDC& dc)
 {
-	if (m_videocap_idx == k_left_image)
-		wxLogMessage(wxT("draw_capture - left")); 
-	if (m_videocap_idx == k_mid_image)
-		wxLogMessage(wxT("draw_capture - mid")); 
-	if (m_videocap_idx == k_right_image)
-		wxLogMessage(wxT("draw_capture - right")); 
-
 	// Grab the next frame from camera
 	c_videocap_manager *videocap_mgr = get_videocap_mgr(); 
 	bool is_open = videocap_mgr->get_ocv_videocap(m_videocap_idx)->isOpened(); 

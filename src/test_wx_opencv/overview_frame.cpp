@@ -44,7 +44,8 @@ void c_overview_cam_panel::on_capture_left_click( wxCommandEvent& event )
 			ocv_mat_ptr grayscale_img = ocv_mat_ptr(new cv::Mat(img->cols, img->rows, CV_8UC1)); 
 			cvtColor(*img, *grayscale_img,  CV_RGB2GRAY); 
 
-			get_ocv_img_mgr()->add_image(LEFT_IMAGE_GRAYSCALE_NAME, grayscale_img);
+			int rotation_angle = 0; 
+			get_ocv_img_mgr()->add_left_grayscale_image(grayscale_img, rotation_angle);
 
 			// Show the image on the image panel 
 			c_overview_img_panel *img_panel = m_overview_frame->get_overview_img_panel(); 
@@ -77,7 +78,8 @@ void c_overview_cam_panel::on_capture_mid_click( wxCommandEvent& event )
 			ocv_mat_ptr grayscale_img = ocv_mat_ptr(new cv::Mat(img->cols, img->rows, CV_8UC1)); 
 			cvtColor(*img, *grayscale_img,  CV_RGB2GRAY); 
 
-			get_ocv_img_mgr()->add_image(MID_IMAGE_GRAYSCALE_NAME, grayscale_img);
+			int rotation_angle = 0; 
+			get_ocv_img_mgr()->add_mid_grayscale_image(grayscale_img, rotation_angle);
 
 			// Show the image on the image panel 
 			c_overview_img_panel *img_panel = m_overview_frame->get_overview_img_panel(); 
@@ -112,7 +114,8 @@ void c_overview_cam_panel::on_capture_right_click( wxCommandEvent& event )
 			ocv_mat_ptr grayscale_img = ocv_mat_ptr(new cv::Mat(img->cols, img->rows, CV_8UC1)); 
 			cvtColor(*img, *grayscale_img,  CV_RGB2GRAY); 
 
-			get_ocv_img_mgr()->add_image(RIGHT_IMAGE_GRAYSCALE_NAME, grayscale_img);
+			int rotation_angle = 0; 
+			get_ocv_img_mgr()->add_right_grayscale_image(grayscale_img, rotation_angle);
 
 			// Show the image on the image panel 
 			c_overview_img_panel *img_panel = m_overview_frame->get_overview_img_panel(); 
@@ -504,4 +507,34 @@ c_overview_graph_panel* c_overview_frame::get_overview_graph_panel_mtf()
 {
 	c_overview_graph_panel *graph_panel = static_cast<c_overview_graph_panel*>(this->FindWindowById(wxID_OVERVIEW_GRAPH_PANEL_MTF));
 	return graph_panel; 
+}
+
+
+void c_overview_frame::on_save_report( wxCommandEvent& event )
+{
+	wxDirDialog* save_report_dlg =
+		new wxDirDialog( this, _("Save Report"), _(""),  
+		wxDD_DEFAULT_STYLE, wxDefaultPosition);
+
+	if ( save_report_dlg->ShowModal() == wxID_OK )
+	{
+		/*
+		SetCurrentFilename(save_report_dlg->GetFilename());
+		theText->LoadFile(save_report_dlg->GetFilename());
+		SetStatusText(GetCurrentFilename(), 0);
+		SetStatusText(save_report_dlg->GetDirectory(),1);
+		*/
+
+		//wxString 
+		
+	
+		//::wxMkdir 
+	}
+}
+
+wxString c_overview_frame::generate_dir_name()
+{
+	
+	return wxT(""); 
+	
 }
