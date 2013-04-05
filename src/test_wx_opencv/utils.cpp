@@ -43,6 +43,7 @@ void wx_log_warning(const char *str, ...)
 	va_end(args); 
 }
 
+#ifdef _DEBUG
 void wx_log_message(const char *str, ...)
 {
 	va_list args;
@@ -52,3 +53,4 @@ void wx_log_message(const char *str, ...)
 	wxVLogMessage(wxString(str, wxConvUTF8).c_str(), args);
 	va_end(args);
 }
+#endif 

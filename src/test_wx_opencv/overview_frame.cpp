@@ -397,7 +397,7 @@ c_overview_frame::c_overview_frame(wxWindow *parent,
 	wxWindow *log_text_ctrl = m_log_wnd->GetFrame()->GetChildren().GetFirst()->GetData(); 
 	log_text_ctrl->SetFont(wxFont(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 	m_log_wnd->GetFrame()->SetSize(650, 800); 
-	m_log_wnd->Show();  
+	// m_log_wnd->Show();  
 
 	add_cam_sub_panel(wxT("Camera"));
 	add_image_sub_panel(wxT("Images")); 

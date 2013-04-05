@@ -1,4 +1,4 @@
-set(TARGET test_wx_opencv)
+set(TARGET LensCaliber)
 
 set(WX_LIB_FILES
 	wxbase28u.lib

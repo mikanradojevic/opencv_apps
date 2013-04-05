@@ -17,8 +17,11 @@ void wx_log_error(const char *str, ...);
 
 void wx_log_warning(const char *str, ...);
 
+#ifdef _DEBUG
 void wx_log_message(const char *str, ...);
-
+#else 
+#define wx_log_message
+#endif
 
 
 //////////////////////////////////////////////////////////////////////////
