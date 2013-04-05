@@ -56,6 +56,8 @@ set(UI_FILES
 	image_frame.h
 	graph_frame.cpp
 	graph_frame.h
+	tools_frame.cpp
+	tools_frame.h
 	overview_frame.cpp
 	overview_frame.h
 	ocv_canvas.cpp

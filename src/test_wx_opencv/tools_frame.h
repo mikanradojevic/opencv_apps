@@ -20,9 +20,11 @@ public:
 	virtual void on_save_report( wxCommandEvent& event ); 
 	
 private:
-	wxString make_folder_name(); 
+	bool validate_input(); 
+	wxString make_folder_name();
 	int write_grayscale_imgs(const wxString& path); 
-
+	int write_hist_graphs(const wxString& path);
+	int write_mtf_graphs(const wxString& path);
 
 	c_overview_frame *m_overview_frame;
 };

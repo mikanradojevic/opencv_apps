@@ -219,8 +219,12 @@ class ToolsFrame : public wxFrame
 	protected:
 		wxNotebook* m_notebook;
 		wxPanel* m_save_page;
+		wxStaticText* m_static_project;
+		wxTextCtrl* m_text_project;
 		wxStaticText* m_static_lens_name;
 		wxTextCtrl* m_txt_lens_name;
+		wxStaticText* m_static_rotation;
+		wxTextCtrl* m_text_rotation;
 		wxButton* m_btn_save;
 		
 		// Virtual event handlers, overide them in your derived class

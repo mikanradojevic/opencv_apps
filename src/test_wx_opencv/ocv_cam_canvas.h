@@ -23,6 +23,7 @@ public:
 	void active_render_loop(bool on);
 
 	ocv_mat_ptr get_current_frame(); 
+	bool is_camera_opened() const { return m_camera_opened; } 
 	
 protected: 
 
@@ -40,6 +41,8 @@ private:
 
 	// Current frame of image from camera 
 	ocv_mat_ptr m_current_frame; 
+	
+	bool m_camera_opened;
 	
 	bool m_render_loop_on;
 	

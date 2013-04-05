@@ -23,6 +23,7 @@ c_overview_cam_panel::c_overview_cam_panel(wxWindow *parent,
 										const wxSize& size /* = wxDefaultSize */, 
 										long style /* = wxTAB_TRAVERSAL */)
 										: OverviewVideoSubPanel(parent, id, pos, size, style)
+										, m_rotation_angle(0)
 { 
 	m_overview_frame = static_cast<c_overview_frame*>(parent);
 
@@ -34,57 +35,76 @@ c_overview_cam_panel::c_overview_cam_panel(wxWindow *parent,
 void c_overview_cam_panel::on_capture_left_click( wxCommandEvent& event )
 {	
 	ocv_mat_ptr img = m_cam_canvas_left->get_current_frame();
-	if (is_image_valid(img))
+	if (m_cam_canvas_left->is_camera_opened() && is_image_valid(img))
 	{
 		if (m_overview_frame)
 		{
 			get_ocv_img_mgr()->add_image(LEFT_IMAGE_ORIGINAL_NAME, img); 
 			
+			wx_log_message("111111");
+
 			// Convert RGB to Grayscale
-			ocv_mat_ptr grayscale_img = ocv_mat_ptr(new cv::Mat(img->cols, img->rows, CV_8UC1)); 
+			cv::Mat temp = img->clone();
+			ocv_mat_ptr grayscale_img = ocv_mat_ptr(new cv::Mat(temp));
 			cvtColor(*img, *grayscale_img,  CV_RGB2GRAY); 
 
-			int rotation_angle = 0; 
-			get_ocv_img_mgr()->add_left_grayscale_image(grayscale_img, rotation_angle);
+			wx_log_message("22222");
+
+			std::stringstream ss; 
+			ss << m_rotation_angle; 
+			m_overview_frame->m_current_left_grayscale_img_name = LEFT_IMAGE_GRAYSCALE_NAME + "-" + ss.str(); 
+			get_ocv_img_mgr()->add_left_grayscale_image(grayscale_img, m_rotation_angle);
+
+			wx_log_message("33333");
 
 			// Show the image on the image panel 
 			c_overview_img_panel *img_panel = m_overview_frame->get_overview_img_panel(); 
 			std::string name = "left_image"; 
 			img_panel->get_ocv_canvas(k_left_image)->set_image(img, name); 
 
+			wx_log_message("444444");
+
 			// Calculate the histogram
 			c_overview_graph_panel *hist_panel = m_overview_frame->get_overview_graph_panel_hist();
 			hist_panel->calculate_histogram(grayscale_img, k_left_image); 
 			hist_panel->UpdateWindowUI(wxUPDATE_UI_RECURSE);
+
+			wx_log_message("55555");
 		}
-		else 
-			assert(false); 
-	}
-	else 
-		assert(false);
-	
+	}	
 }
 
 void c_overview_cam_panel::on_capture_mid_click( wxCommandEvent& event ) 
 { 
 	ocv_mat_ptr img = m_cam_canvas_mid->get_current_frame();
-	if (is_image_valid(img))
+	if (m_cam_canvas_mid->is_camera_opened() && is_image_valid(img))
 	{
 		if (m_overview_frame)
 		{
 			get_ocv_img_mgr()->add_image(MID_IMAGE_ORIGINAL_NAME, img); 
 
+			wx_log_message("111111");
+
 			// Convert RGB to Grayscale
-			ocv_mat_ptr grayscale_img = ocv_mat_ptr(new cv::Mat(img->cols, img->rows, CV_8UC1)); 
+			cv::Mat temp = img->clone();
+			ocv_mat_ptr grayscale_img = ocv_mat_ptr(new cv::Mat(temp));
 			cvtColor(*img, *grayscale_img,  CV_RGB2GRAY); 
 
-			int rotation_angle = 0; 
-			get_ocv_img_mgr()->add_mid_grayscale_image(grayscale_img, rotation_angle);
+			wx_log_message("22222");
+
+			std::stringstream ss; 
+			ss << m_rotation_angle; 
+			m_overview_frame->m_current_mid_grayscale_img_name = MID_IMAGE_GRAYSCALE_NAME + "-" + ss.str(); 
+			get_ocv_img_mgr()->add_mid_grayscale_image(grayscale_img, m_rotation_angle);
+
+			wx_log_message("33333");
 
 			// Show the image on the image panel 
 			c_overview_img_panel *img_panel = m_overview_frame->get_overview_img_panel(); 
 			std::string name = "mid_image"; 
 			img_panel->get_ocv_canvas(k_mid_image)->set_image(img, name); 
+
+			wx_log_message("444444");
 
 			// Calculate the histogram
 			c_overview_graph_panel *hist_panel = m_overview_frame->get_overview_graph_panel_hist();
@@ -92,11 +112,7 @@ void c_overview_cam_panel::on_capture_mid_click( wxCommandEvent& event )
 			hist_panel->UpdateWindowUI(wxUPDATE_UI_RECURSE);
 			
 		}
-		else 
-			assert(false); 
 	}
-	else 
-		assert(false);
 }
 
 void c_overview_cam_panel::on_capture_right_click( wxCommandEvent& event )
@@ -104,18 +120,22 @@ void c_overview_cam_panel::on_capture_right_click( wxCommandEvent& event )
 	
 	ocv_mat_ptr img = m_cam_canvas_right->get_current_frame();
 	e_image_idx img_idx = k_right_image; 
-	if (is_image_valid(img))
+	if (m_cam_canvas_right->is_camera_opened() && is_image_valid(img))
 	{
 		if (m_overview_frame)
 		{
 			get_ocv_img_mgr()->add_image(RIGHT_IMAGE_ORIGINAL_NAME, img); 
 
 			// Convert RGB to Grayscale
-			ocv_mat_ptr grayscale_img = ocv_mat_ptr(new cv::Mat(img->cols, img->rows, CV_8UC1)); 
+			cv::Mat temp = img->clone();
+			ocv_mat_ptr grayscale_img = ocv_mat_ptr(new cv::Mat(temp));
 			cvtColor(*img, *grayscale_img,  CV_RGB2GRAY); 
+			temp.release();
 
-			int rotation_angle = 0; 
-			get_ocv_img_mgr()->add_right_grayscale_image(grayscale_img, rotation_angle);
+			std::stringstream ss; 
+			ss << m_rotation_angle; 
+			m_overview_frame->m_current_right_grayscale_img_name = RIGHT_IMAGE_GRAYSCALE_NAME + "-" + ss.str(); 
+			get_ocv_img_mgr()->add_right_grayscale_image(grayscale_img, m_rotation_angle);
 
 			// Show the image on the image panel 
 			c_overview_img_panel *img_panel = m_overview_frame->get_overview_img_panel(); 
@@ -127,12 +147,7 @@ void c_overview_cam_panel::on_capture_right_click( wxCommandEvent& event )
 			hist_panel->calculate_histogram(grayscale_img, k_right_image); 
 			hist_panel->UpdateWindowUI(wxUPDATE_UI_RECURSE);
 		}
-		else 
-			assert(false); 
 	}
-	else 
-		assert(false);
-
 }
 
 void c_overview_cam_panel::on_open_cam_left_click( wxCommandEvent& event )
@@ -220,7 +235,7 @@ c_ocv_canvas* c_overview_img_panel::get_ocv_canvas(e_image_idx img_idx)
 
 void c_overview_img_panel::on_left_img_thunmnail_double_click(wxMouseEvent& event)
 {
-	ocv_mat_ptr left_grayscale_img = get_ocv_img_mgr()->find_image_by_name(LEFT_IMAGE_GRAYSCALE_NAME); 
+	ocv_mat_ptr left_grayscale_img = get_ocv_img_mgr()->find_image_by_name(m_overview_frame->m_current_left_grayscale_img_name); 
 	if (left_grayscale_img)
 	{ 
 		c_image_frame *img_frame = new c_image_frame(m_overview_frame, wxID_IMAGE_FRAME);
@@ -231,7 +246,7 @@ void c_overview_img_panel::on_left_img_thunmnail_double_click(wxMouseEvent& even
 
 void c_overview_img_panel::on_mid_img_thunmnail_double_click( wxMouseEvent& event )
 {
-	ocv_mat_ptr grayscale_img = get_ocv_img_mgr()->find_image_by_name(MID_IMAGE_GRAYSCALE_NAME); 
+	ocv_mat_ptr grayscale_img = get_ocv_img_mgr()->find_image_by_name(m_overview_frame->m_current_mid_grayscale_img_name); 
 	if (grayscale_img)
 	{ 
 		c_image_frame *img_frame = new c_image_frame(m_overview_frame, wxID_IMAGE_FRAME);
@@ -242,7 +257,7 @@ void c_overview_img_panel::on_mid_img_thunmnail_double_click( wxMouseEvent& even
 
 void c_overview_img_panel::on_right_img_thunmnail_double_click( wxMouseEvent& event )
 { 
-	ocv_mat_ptr grayscale_img = get_ocv_img_mgr()->find_image_by_name(RIGHT_IMAGE_GRAYSCALE_NAME); 
+	ocv_mat_ptr grayscale_img = get_ocv_img_mgr()->find_image_by_name(m_overview_frame->m_current_right_grayscale_img_name); 
 	if (grayscale_img)
 	{ 
 		c_image_frame *img_frame = new c_image_frame(m_overview_frame, wxID_IMAGE_FRAME);
@@ -334,6 +349,9 @@ void c_overview_graph_panel::calculate_mtf(ocv_mat_ptr img, e_image_idx img_idx,
 		mtf_data_vec mtf_data;
 		cv::Point p1(start.x, start.y);
 		cv::Point p2(end.x, end.y); 
+		if (p1.x == p2.x && p1.y == p2.y)
+			return; 
+		
 		calc_mtf(img, p1, p2, mtf_data);
 
 		switch (img_idx)

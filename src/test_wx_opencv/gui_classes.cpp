@@ -354,12 +354,26 @@ ToolsFrame::ToolsFrame( wxWindow* parent, wxWindowID id, const wxString& title, 
 	fgSizer1->SetFlexibleDirection( wxBOTH );
 	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
+	m_static_project = new wxStaticText( m_save_page, wxID_ANY, wxT("Project"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_static_project->Wrap( -1 );
+	fgSizer1->Add( m_static_project, 0, wxALL, 5 );
+	
+	m_text_project = new wxTextCtrl( m_save_page, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer1->Add( m_text_project, 0, wxALL, 5 );
+	
 	m_static_lens_name = new wxStaticText( m_save_page, wxID_ANY, wxT("Lens Name: "), wxDefaultPosition, wxDefaultSize, 0 );
 	m_static_lens_name->Wrap( -1 );
 	fgSizer1->Add( m_static_lens_name, 0, wxALL, 5 );
 	
-	m_txt_lens_name = new wxTextCtrl( m_save_page, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_txt_lens_name = new wxTextCtrl( m_save_page, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), 0 );
 	fgSizer1->Add( m_txt_lens_name, 0, wxALL, 5 );
+	
+	m_static_rotation = new wxStaticText( m_save_page, wxID_ANY, wxT("Lens Rotation Angle:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_static_rotation->Wrap( -1 );
+	fgSizer1->Add( m_static_rotation, 0, wxALL, 5 );
+	
+	m_text_rotation = new wxTextCtrl( m_save_page, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer1->Add( m_text_rotation, 0, wxALL, 5 );
 	
 	m_btn_save = new wxButton( m_save_page, wxID_ANY, wxT("Save Report"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer1->Add( m_btn_save, 0, wxALL, 5 );

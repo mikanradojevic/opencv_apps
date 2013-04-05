@@ -30,6 +30,10 @@ public:
 
 private: 
 	c_overview_frame *m_overview_frame; 
+
+	int m_rotation_angle; 
+
+
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -74,6 +78,10 @@ public:
 	void calculate_mtf(ocv_mat_ptr img, e_image_idx img_idx, wxPoint& start, wxPoint& end); 
 	void set_label_text(const wxString& label); 
 
+	c_graph_canvas* get_left_graph_canvas() { return m_graph_wnd_left; }
+	c_graph_canvas* get_mid_graph_canvas() { return m_graph_wnd_mid; }
+	c_graph_canvas* get_right_graph_canvas() { return m_graph_wnd_right; }
+
 private:
 	e_graph_type m_graph_type; 
 	
@@ -104,6 +112,10 @@ public:
 	
 	virtual void on_save_report( wxCommandEvent& event ); 
 
+
+	std::string m_current_left_grayscale_img_name;
+	std::string m_current_mid_grayscale_img_name;
+	std::string m_current_right_grayscale_img_name;
 	
 private: 
 	void init_config(); 

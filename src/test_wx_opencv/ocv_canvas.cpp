@@ -28,6 +28,7 @@ c_ocv_canvas::c_ocv_canvas(wxWindow *parent,
 	, m_update(true)
 	, m_draw_line(false)
 	, m_using_line_tool(false)
+	, m_is_rgb(true)
 {
 }
 
@@ -50,17 +51,25 @@ void c_ocv_canvas::on_paint(wxPaintEvent& event)
 	wxPaintDC dc(this);
 	PrepareDC(dc);
 
+	wx_log_message("c_ocv_canvas::on_paint()");
+	
 	if (m_update && is_image_valid(m_img))
 	{
 		draw_cv_img(dc, m_img);
 		m_update = false;
+		
+		wx_log_message("c_ocv_canvas::on_paint() - 2");
 	} 
 	else if (is_image_valid(m_img))
 	{
 		draw_blank(dc); 
 	}
 
+	wx_log_message("c_ocv_canvas::on_paint() - 3");
+
 	draw_line(dc); 
+
+	wx_log_message("c_ocv_canvas::on_paint() - 4");
 } 
 
 
@@ -151,13 +160,19 @@ void c_ocv_canvas::draw_cv_img(wxDC& dc, ocv_mat_ptr& ocv_img)
 		cv::Size cv_size(client_size.GetWidth(), client_size.GetHeight());
 		ocv_mat_ptr resized_img = resize_image(m_img, cv_size); 
 		temp = resized_img->clone(); 
+		wx_log_message("c_ocv_canvas::draw_cv_img");
+		
 		if (m_is_rgb) 
 		{ 
+			wx_log_message("c_ocv_canvas::draw_cv_img - 1.5");
 			cvtColor(*resized_img, temp, CV_RGB2BGR); 
+			wx_log_message("c_ocv_canvas::draw_cv_img - 2");
 		} 
 		else 
 		{
+			wx_log_message("c_ocv_canvas::draw_cv_img - 2.5");
 			cvtColor(*m_img, temp, CV_GRAY2BGR);
+			wx_log_message("c_ocv_canvas::draw_cv_img - 3");
 		}
 	}
 	else

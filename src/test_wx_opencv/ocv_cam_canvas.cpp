@@ -41,6 +41,7 @@ c_ocv_cam_canvas::c_ocv_cam_canvas(wxWindow *parent,
 								const wxString& name)
 								: super(parent, id, pos, size, style, name)
 								, m_render_loop_on(false)
+								, m_camera_opened(false)
 { 
 	m_render_timer = new c_render_timer(this); 
 	m_current_frame = make_ocv_image(1, 1); 
@@ -93,6 +94,9 @@ void c_ocv_cam_canvas::draw_captured(wxDC& dc)
 	
 	// Draw the bitmap 
 	dc.DrawBitmap(wx_bitmap, 0, 0); 
+
+	if (!m_camera_opened) 
+		m_camera_opened = true;
 }
 
 void c_ocv_cam_canvas::on_idle(wxIdleEvent& event)
