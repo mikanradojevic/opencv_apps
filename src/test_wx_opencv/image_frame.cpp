@@ -76,6 +76,10 @@ void c_image_frame::on_calc_mtf( wxCommandEvent& event )
 		m_overview_frame->get_overview_graph_panel_mtf()->Refresh(); 
 		m_overview_frame->get_overview_graph_panel_mtf()->Update(); 
 	}
+	else 
+	{
+		wx_log_message("line is not ready");
+	}
 }
 
 void c_image_frame::on_calc_histogram( wxCommandEvent& event )

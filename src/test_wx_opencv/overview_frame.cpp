@@ -117,9 +117,7 @@ void c_overview_cam_panel::on_capture_mid_click( wxCommandEvent& event )
 
 void c_overview_cam_panel::on_capture_right_click( wxCommandEvent& event )
 { 
-	
 	ocv_mat_ptr img = m_cam_canvas_right->get_current_frame();
-	e_image_idx img_idx = k_right_image; 
 	if (m_cam_canvas_right->is_camera_opened() && is_image_valid(img))
 	{
 		if (m_overview_frame)
@@ -367,6 +365,10 @@ void c_overview_graph_panel::calculate_mtf(ocv_mat_ptr img, e_image_idx img_idx,
 			break; 
 		}  
 	}
+	else 
+	{
+		wx_log_message("c_overview_graph_panel::calculate_mtf() failed!");
+	}
 } 
 
 void c_overview_graph_panel::on_img_loaded(wxEvent& event)
@@ -396,8 +398,11 @@ c_overview_frame::c_overview_frame(wxWindow *parent,
 	m_log_wnd = new wxLogWindow(this, wxT("Log"), false, true); 
 	wxWindow *log_text_ctrl = m_log_wnd->GetFrame()->GetChildren().GetFirst()->GetData(); 
 	log_text_ctrl->SetFont(wxFont(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-	m_log_wnd->GetFrame()->SetSize(650, 800); 
-	// m_log_wnd->Show();  
+	m_log_wnd->GetFrame()->SetSize(650, 800);
+
+#ifdef _DEBUG
+	m_log_wnd->Show();  
+#endif 
 
 	add_cam_sub_panel(wxT("Camera"));
 	add_image_sub_panel(wxT("Images")); 

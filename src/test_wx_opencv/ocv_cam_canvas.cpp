@@ -117,10 +117,10 @@ void c_ocv_cam_canvas::draw_now()
 
 void c_ocv_cam_canvas::active_render_loop(bool on) 
 {
+	m_camera_opened = on;
 	m_render_loop_on = on; 
 	m_render_timer->Stop(); 
 
-	
 	if (on)
 		m_render_timer->Start(10000, true); 
 	else
