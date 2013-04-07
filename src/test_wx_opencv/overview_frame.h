@@ -112,7 +112,6 @@ public:
 	
 	virtual void on_save_report( wxCommandEvent& event ); 
 
-
 	std::string m_current_left_grayscale_img_name;
 	std::string m_current_mid_grayscale_img_name;
 	std::string m_current_right_grayscale_img_name;

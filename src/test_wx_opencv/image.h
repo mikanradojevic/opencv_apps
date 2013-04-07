@@ -22,21 +22,24 @@ class c_ocv_image_manager
 {
 	typedef std::map<std::string, ocv_mat_ptr> images_map;
 	typedef std::map<std::string, ocv_mat_ptr> hist_map;  
+	typedef std::map<std::string, int> images_counts_dict; 
 	
 public: 
 	c_ocv_image_manager();
 	~c_ocv_image_manager();
  
-	int add_left_grayscale_image(ocv_mat_ptr img, int rotation_angle);
-	int add_mid_grayscale_image(ocv_mat_ptr img, int rotation_angle);
-	int add_right_grayscale_image(ocv_mat_ptr img, int rotation_angle); 
+	std::string add_left_grayscale_image(ocv_mat_ptr img, int rotation_angle);
+	std::string add_mid_grayscale_image(ocv_mat_ptr img, int rotation_angle);
+	std::string add_right_grayscale_image(ocv_mat_ptr img, int rotation_angle); 
 	
 	// Add an image to the manager
-	int add_image(const std::string& name, ocv_mat_ptr img); 
+	std::string add_image(const std::string& name, ocv_mat_ptr img); 
 	// Remove an image 
 	int remvove_image(const std::string& name, ocv_mat_ptr img); 
 	// Find an image
 	ocv_mat_ptr find_image_by_name(const std::string& name); 
+	int find_image_count_by_name(const std::string& name);
+	void increase_image_count(const std::string& name); 
 
 	std::vector<std::string> get_left_grayscale_img_names() const { return m_left_image_names; }
 	std::vector<std::string> get_mid_grayscale_img_names() const { return m_mid_image_names; }
@@ -46,10 +49,12 @@ private:
 	
 	images_map m_image_dict; 
 	hist_map m_hist_dict; 
+	images_counts_dict m_images_count_dict; 
 	
 	std::vector<std::string> m_left_image_names; 
 	std::vector<std::string> m_mid_image_names;
-	std::vector<std::string> m_right_image_names; 
+	std::vector<std::string> m_right_image_names;
+ 
 
 };
 extern c_ocv_image_manager* get_ocv_img_mgr(); 

@@ -49,11 +49,8 @@ void c_overview_cam_panel::on_capture_left_click( wxCommandEvent& event )
 			cvtColor(*img, *grayscale_img,  CV_RGB2GRAY); 
 
 			wx_log_message("22222");
-
-			std::stringstream ss; 
-			ss << m_rotation_angle; 
-			m_overview_frame->m_current_left_grayscale_img_name = LEFT_IMAGE_GRAYSCALE_NAME + "-" + ss.str(); 
-			get_ocv_img_mgr()->add_left_grayscale_image(grayscale_img, m_rotation_angle);
+			
+			m_overview_frame->m_current_left_grayscale_img_name = get_ocv_img_mgr()->add_left_grayscale_image(grayscale_img, m_rotation_angle);
 
 			wx_log_message("33333");
 
@@ -91,11 +88,9 @@ void c_overview_cam_panel::on_capture_mid_click( wxCommandEvent& event )
 			cvtColor(*img, *grayscale_img,  CV_RGB2GRAY); 
 
 			wx_log_message("22222");
-
-			std::stringstream ss; 
-			ss << m_rotation_angle; 
-			m_overview_frame->m_current_mid_grayscale_img_name = MID_IMAGE_GRAYSCALE_NAME + "-" + ss.str(); 
-			get_ocv_img_mgr()->add_mid_grayscale_image(grayscale_img, m_rotation_angle);
+			
+			m_overview_frame->m_current_mid_grayscale_img_name = 
+				get_ocv_img_mgr()->add_mid_grayscale_image(grayscale_img, m_rotation_angle);
 
 			wx_log_message("33333");
 
@@ -130,10 +125,8 @@ void c_overview_cam_panel::on_capture_right_click( wxCommandEvent& event )
 			cvtColor(*img, *grayscale_img,  CV_RGB2GRAY); 
 			temp.release();
 
-			std::stringstream ss; 
-			ss << m_rotation_angle; 
-			m_overview_frame->m_current_right_grayscale_img_name = RIGHT_IMAGE_GRAYSCALE_NAME + "-" + ss.str(); 
-			get_ocv_img_mgr()->add_right_grayscale_image(grayscale_img, m_rotation_angle);
+			m_overview_frame->m_current_right_grayscale_img_name = 
+				get_ocv_img_mgr()->add_right_grayscale_image(grayscale_img, m_rotation_angle);
 
 			// Show the image on the image panel 
 			c_overview_img_panel *img_panel = m_overview_frame->get_overview_img_panel(); 

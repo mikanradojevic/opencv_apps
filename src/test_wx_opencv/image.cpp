@@ -18,59 +18,65 @@ c_ocv_image_manager::~c_ocv_image_manager()
 {	
 }
 
-int c_ocv_image_manager::add_left_grayscale_image(ocv_mat_ptr img, int rotation_angle)
+std::string c_ocv_image_manager::add_left_grayscale_image(ocv_mat_ptr img, int rotation_angle)
 {
 	std::stringstream ss; 
 	ss << rotation_angle; 
 	std::string name = LEFT_IMAGE_GRAYSCALE_NAME + "-" + ss.str(); 
-	int r = add_image(name, img); 
+	std::string new_name = add_image(name, img); 
 	
-	if (r)
-		m_left_image_names.push_back(name);
+	m_left_image_names.push_back(new_name);
 	
-	return r; 
+	return new_name; 
 }
 
-int c_ocv_image_manager::add_mid_grayscale_image(ocv_mat_ptr img, int rotation_angle)
+std::string c_ocv_image_manager::add_mid_grayscale_image(ocv_mat_ptr img, int rotation_angle)
 {
 	std::stringstream ss; 
 	ss << rotation_angle; 
 	std::string name = MID_IMAGE_GRAYSCALE_NAME + "-" + ss.str(); 
-	int r = add_image(name, img); 
+	std::string new_name = add_image(name, img); 
 
-	if (r)
-		m_mid_image_names.push_back(name);
+	m_mid_image_names.push_back(new_name);
 
-	return r; 
+	return new_name; 
 }
 
-int c_ocv_image_manager::add_right_grayscale_image(ocv_mat_ptr img, int rotation_angle)
+std::string c_ocv_image_manager::add_right_grayscale_image(ocv_mat_ptr img, int rotation_angle)
 {
 	std::stringstream ss; 
 	ss << rotation_angle; 
 	std::string name = RIGHT_IMAGE_GRAYSCALE_NAME + "-" + ss.str(); 
-	int r = add_image(name, img); 
-
-	if (r)
-		m_right_image_names.push_back(name);
+	std::string new_name = add_image(name, img); 
+		
+	m_right_image_names.push_back(new_name);
 	
-	return r; 
+	return new_name; 
 }
 
-int c_ocv_image_manager::add_image(const std::string& name, ocv_mat_ptr img) 
+std::string c_ocv_image_manager::add_image(const std::string& name, ocv_mat_ptr img) 
 {
 	 if (is_image_valid(img))
 	 {
 		 ocv_mat_ptr found_img = find_image_by_name(name);
+		 int img_count = find_image_count_by_name(name); 
 		 if (!found_img)
 		 {
 			 m_image_dict.insert(images_map::value_type(name, img));
-			 return 1; 
+			 m_images_count_dict.insert(images_counts_dict::value_type(name, ++img_count));
+			 return name; 
 		 }
 		 else 
-			 return 0; 
-	 }
-	 return 0; 
+		 {
+			 std::stringstream ss; 
+			 ss << name << "-" << img_count;
+			 m_image_dict.insert(images_map::value_type(ss.str(), img));
+			 increase_image_count(name); 
+			 return ss.str();
+		 }
+	 } 
+	 else
+		 return std::string("INVALID_IMG");
 }
 
 int c_ocv_image_manager::remvove_image(const std::string& name, ocv_mat_ptr img) 
@@ -93,6 +99,22 @@ ocv_mat_ptr c_ocv_image_manager::find_image_by_name(const std::string& name)
 		return it->second; 
 	else 
 		return ocv_mat_ptr(); 
+}
+
+int c_ocv_image_manager::find_image_count_by_name(const std::string& name)
+{
+	images_counts_dict::iterator it = m_images_count_dict.find(name); 
+	if (it != m_images_count_dict.end())
+		return it->second; 
+	else 
+		return 0;
+}
+
+void c_ocv_image_manager::increase_image_count(const std::string& name)
+{
+	images_counts_dict::iterator it = m_images_count_dict.find(name); 
+	if (it != m_images_count_dict.end())
+		(it->second)++;
 }
 
 ////////////////////////////////////////////////////////////////////////// 
